@@ -16,7 +16,7 @@ export function App() {
 		<>
 			<header>
 				<a href={listPath}>
-					<h1>Конспекты</h1>
+					<h1>Конспект</h1>
 				</a>
 				{signedIn && (
 					<button type="button" onClick={logout}>
