@@ -1,3 +1,4 @@
+import { Icon } from "../Icon";
 import type { Issue, Section, SectionKind } from "../api/types";
 import { AutoTextarea } from "./AutoTextarea";
 import { isRitual } from "./edit";
@@ -40,16 +41,17 @@ export function SectionCard({ index, total, section, issues, onChange, onMove, o
 					))}
 				</select>
 				<span className="spacer" />
-				<button type="button" aria-label="Выше" disabled={index === 0} onClick={() => onMove(-1)}>
-					↑
+				<button type="button" className="square" aria-label="Выше" disabled={index === 0} onClick={() => onMove(-1)}>
+					<Icon name="up" />
 				</button>
 				<button
 					type="button"
+					className="square"
 					aria-label="Ниже"
 					disabled={index === total - 1}
 					onClick={() => onMove(1)}
 				>
-					↓
+					<Icon name="down" />
 				</button>
 				<button type="button" onClick={onRemove}>
 					Удалить

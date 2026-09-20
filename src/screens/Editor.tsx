@@ -5,7 +5,9 @@ import { AutoTextarea } from "../editor/AutoTextarea";
 import { cleanLesson, emptySection, moveItem, removeItem, replaceItem, snapshot } from "../editor/edit";
 import { IssueList } from "../editor/IssueList";
 import { countBySeverity, issuesAt } from "../editor/issues";
+import { MONTHS } from "../editor/months";
 import { SectionCard } from "../editor/SectionCard";
+import { Icon } from "../Icon";
 import { listPath } from "../router";
 import { message } from "./Login";
 
@@ -84,7 +86,7 @@ export function Editor({ id }: { id: string }) {
 	return (
 		<>
 			<a className="back" href={listPath}>
-				← Все конспекты
+				<Icon name="left" /> Все конспекты
 			</a>
 
 			<section className="sheet">
@@ -92,7 +94,11 @@ export function Editor({ id }: { id: string }) {
 				<div className="row">
 					<label>
 						Месяц
-						<input value={lesson.month} onChange={(e) => edit({ ...lesson, month: e.target.value })} />
+						<select value={lesson.month} onChange={(e) => edit({ ...lesson, month: e.target.value })}>
+							{(MONTHS.includes(lesson.month) ? MONTHS : [lesson.month, ...MONTHS]).map((m) => (
+								<option key={m}>{m}</option>
+							))}
+						</select>
 					</label>
 					<label>
 						Номер

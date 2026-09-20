@@ -1,22 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { generateLesson } from "../api/client";
+import { MONTHS } from "../editor/months";
 import { lessonPath } from "../router";
 import { message } from "./Login";
-
-const MONTHS = [
-	"Январь",
-	"Февраль",
-	"Март",
-	"Апрель",
-	"Май",
-	"Июнь",
-	"Июль",
-	"Август",
-	"Сентябрь",
-	"Октябрь",
-	"Ноябрь",
-	"Декабрь",
-];
 
 export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 	const [month, setMonth] = useState(MONTHS[new Date().getMonth()] ?? "");
