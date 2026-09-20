@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Lesson } from "../api/types";
-import { cleanLesson, moveItem, removeItem, replaceItem, snapshot } from "./edit";
+import { cleanLesson, moveItem, sectionNotes, removeItem, replaceItem, snapshot } from "./edit";
 
 const lesson: Lesson = {
 	id: "a".repeat(32),
@@ -60,5 +60,14 @@ describe("snapshot", () => {
 
 	it("changes when the text changes", () => {
 		expect(snapshot({ ...lesson, topic: "Фрукты" })).not.toBe(snapshot(lesson));
+	});
+});
+
+describe("sectionNotes", () => {
+	it("keeps only non-blank remarks with their part position", () => {
+		expect(sectionNotes(["", " проще ", "  ", "короче"])).toEqual([
+			{ index: 1, text: "проще" },
+			{ index: 3, text: "короче" },
+		]);
 	});
 });

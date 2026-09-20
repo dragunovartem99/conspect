@@ -412,3 +412,15 @@ fieldset:disabled {
 		flex-wrap: wrap;
 	}
 }
+
+.note summary {
+	cursor: pointer;
+	color: var(--muted, inherit);
+}
+
+.row-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 10px;
+}

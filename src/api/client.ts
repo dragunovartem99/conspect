@@ -4,6 +4,7 @@ import type {
 	Lesson,
 	LessonSummary,
 	LessonWithIssues,
+	ReviseRequest,
 } from "./types";
 
 const API_URL: string =
@@ -92,6 +93,10 @@ export const updateLesson = (lesson: Lesson) =>
 		method: "PUT",
 		body: JSON.stringify(lesson),
 	});
+
+/** Returns a rewrite for review; the server saves nothing until the editor's own save. */
+export const reviseLesson = (id: string, body: ReviseRequest) =>
+	json<LessonWithIssues>(`/api/lessons/${id}/revise`, { method: "POST", body: JSON.stringify(body) });
 
 export async function deleteLesson(id: string): Promise<void> {
 	await request(`/api/lessons/${id}`, { method: "DELETE" });

@@ -10,6 +10,8 @@ interface Props {
 	total: number;
 	section: Section;
 	issues: Issue[];
+	note: string;
+	onNote: (note: string) => void;
 	onChange: (section: Section) => void;
 	onMove: (delta: -1 | 1) => void;
 	onRemove: () => void;
@@ -17,7 +19,7 @@ interface Props {
 
 const KINDS = Object.keys(KIND_LABELS) as SectionKind[];
 
-export function SectionCard({ index, total, section, issues, onChange, onMove, onRemove }: Props) {
+export function SectionCard({ index, total, section, issues, note, onNote, onChange, onMove, onRemove }: Props) {
 	const path = `sections[${index}]`;
 	const own = issuesAt(issues, path);
 	const titleIssues = issuesAt(issues, `${path}.title`);
@@ -77,6 +79,19 @@ export function SectionCard({ index, total, section, issues, onChange, onMove, o
 			/>
 			{fixed && <p className="hint">Текст ритуала фиксированный, он подставляется автоматически.</p>}
 			<IssueList issues={own} />
+
+			{!fixed && (
+				<details className="note">
+					<summary>Что изменить в этой части{note && " ✎"}</summary>
+					<AutoTextarea
+						aria-label="Замечание к части"
+						rows={2}
+						placeholder="Например: сделай загадку проще"
+						value={note}
+						onChange={(e) => onNote(e.target.value)}
+					/>
+				</details>
+			)}
 		</li>
 	);
 }

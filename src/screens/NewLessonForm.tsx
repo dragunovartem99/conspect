@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { generateLesson } from "../api/client";
+import { AutoTextarea } from "../editor/AutoTextarea";
 import { MONTHS } from "../editor/months";
 import { lessonPath } from "../router";
 import { message } from "./Login";
@@ -9,6 +10,7 @@ export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 	const [number, setNumber] = useState(nextNumber);
 	const [topic, setTopic] = useState("");
 	const [character, setCharacter] = useState("");
+	const [brief, setBrief] = useState("");
 	const [busy, setBusy] = useState(false);
 	const [seconds, setSeconds] = useState(0);
 	const [error, setError] = useState<string | null>(null);
@@ -32,6 +34,7 @@ export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 				number,
 				topic: topic.trim(),
 				character: character.trim() || null,
+				brief: brief.trim() || null,
 			});
 			window.location.hash = lessonPath(result.lesson.id);
 		} catch (e) {
@@ -73,6 +76,15 @@ export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 						value={character}
 						onChange={(e) => setCharacter(e.target.value)}
 						placeholder="Если пусто, придумает нейросеть"
+					/>
+				</label>
+				<label>
+					Техническое задание <span className="muted">(необязательно)</span>
+					<AutoTextarea
+						rows={3}
+						value={brief}
+						onChange={(e) => setBrief(e.target.value)}
+						placeholder="Что обязательно должно быть в конспекте: игры, загадки, задания, чего избегать"
 					/>
 				</label>
 			</fieldset>

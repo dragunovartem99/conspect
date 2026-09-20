@@ -38,6 +38,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/lessons/{lesson_id}/revise": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revise Lesson
+         * @description Rewrite the lesson from the teacher's remarks. Nothing is saved: the editor decides.
+         */
+        post: operations["revise_lesson_api_lessons__lesson_id__revise_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lessons": {
         parameters: {
             query?: never;
@@ -105,6 +125,8 @@ export interface components {
             topic: string;
             /** Character */
             character?: string | null;
+            /** Brief */
+            brief?: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -145,6 +167,8 @@ export interface components {
             topic: string;
             /** Character */
             character?: string | null;
+            /** Brief */
+            brief?: string | null;
             /** Objectives */
             objectives: string[];
             /** Equipment */
@@ -187,6 +211,19 @@ export interface components {
             /** Token */
             token: string;
         };
+        /** ReviseRequest */
+        ReviseRequest: {
+            /** @description The lesson as it is in the editor, unsaved edits included. */
+            lesson: components["schemas"]["Lesson"];
+            /**
+             * Feedback
+             * @description A remark on the whole lesson.
+             * @default
+             */
+            feedback: string;
+            /** Sections */
+            sections?: components["schemas"]["SectionFeedback"][];
+        };
         /** Section */
         Section: {
             /**
@@ -198,6 +235,16 @@ export interface components {
             title: string;
             /** Paragraphs */
             paragraphs: string[];
+        };
+        /** SectionFeedback */
+        SectionFeedback: {
+            /**
+             * Index
+             * @description Part position in the lesson; the ritual is part 0.
+             */
+            index: number;
+            /** Text */
+            text: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -266,6 +313,43 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["GenerateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LessonWithIssues"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revise_lesson_api_lessons__lesson_id__revise_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lesson_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviseRequest"];
             };
         };
         responses: {

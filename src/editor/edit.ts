@@ -34,6 +34,10 @@ export function cleanLesson(lesson: Lesson): Lesson {
 	};
 }
 
+/** The non-blank per-part remarks in the shape the API takes. */
+export const sectionNotes = (notes: string[]) =>
+	notes.flatMap((text, index) => (text.trim() ? [{ index, text: text.trim() }] : []));
+
 export const snapshot = (lesson: Lesson): string => JSON.stringify(cleanLesson(lesson));
 
 export const isRitual = (kind: SectionKind): boolean => kind === "ritual";

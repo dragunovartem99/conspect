@@ -9,3 +9,4 @@ export type Issue = Schemas["Issue"];
 export type LessonWithIssues = Schemas["LessonWithIssues"];
 export type LessonSummary = Schemas["LessonSummary"];
 export type GenerateRequest = Schemas["GenerateRequest"];
+export type ReviseRequest = Schemas["ReviseRequest"];

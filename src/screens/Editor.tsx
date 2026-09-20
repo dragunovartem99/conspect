@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { downloadDocx, getLesson, updateLesson } from "../api/client";
+import { downloadDocx, getLesson, reviseLesson, updateLesson } from "../api/client";
 import type { Issue, Lesson } from "../api/types";
 import { AutoTextarea } from "../editor/AutoTextarea";
-import { cleanLesson, emptySection, moveItem, removeItem, replaceItem, snapshot } from "../editor/edit";
+import { cleanLesson, emptySection, sectionNotes, moveItem, removeItem, replaceItem, snapshot } from "../editor/edit";
 import { IssueList } from "../editor/IssueList";
 import { countBySeverity, issuesAt } from "../editor/issues";
 import { MONTHS } from "../editor/months";
@@ -16,7 +16,12 @@ export function Editor({ id }: { id: string }) {
 	const [saved, setSaved] = useState("");
 	const [issues, setIssues] = useState<Issue[]>([]);
 	const [error, setError] = useState<string | null>(null);
-	const [busy, setBusy] = useState<"save" | "docx" | null>(null);
+	const [busy, setBusy] = useState<"save" | "docx" | "revise" | null>(null);
+	/** Remarks for the next rewrite: one per part, in the parts' order, plus one for the whole lesson. */
+	const [notes, setNotes] = useState<string[]>([]);
+	const [feedback, setFeedback] = useState("");
+	/** The text from before the last rewrite, so a bad rewrite can be undone. */
+	const [before, setBefore] = useState<{ lesson: Lesson; notes: string[]; feedback: string } | null>(null);
 
 	function accept(result: { lesson: Lesson; issues: Issue[] }) {
 		setLesson(result.lesson);
@@ -29,7 +34,13 @@ export function Editor({ id }: { id: string }) {
 		setLesson(null);
 		setError(null);
 		getLesson(id)
-			.then((result) => !cancelled && accept(result))
+			.then((result) => {
+				if (cancelled) return;
+				accept(result);
+				setNotes(result.lesson.sections.map(() => ""));
+				setFeedback("");
+				setBefore(null);
+			})
 			.catch((e) => !cancelled && setError(message(e)));
 		return () => {
 			cancelled = true;
@@ -69,6 +80,38 @@ export function Editor({ id }: { id: string }) {
 		}
 	}
 
+	async function revise() {
+		if (!lesson) return;
+		setBusy("revise");
+		setError(null);
+		try {
+			const result = await reviseLesson(id, {
+				lesson: cleanLesson(lesson),
+				feedback: feedback.trim(),
+				sections: sectionNotes(notes),
+			});
+			setBefore({ lesson, notes, feedback });
+			// Not saved: it shows as an unsaved change until the teacher accepts it.
+			setLesson(result.lesson);
+			setIssues(result.issues);
+			setNotes(result.lesson.sections.map(() => ""));
+			setFeedback("");
+		} catch (e) {
+			setError(message(e));
+		} finally {
+			setBusy(null);
+		}
+	}
+
+	function undoRevise() {
+		if (!before) return;
+		setLesson(before.lesson);
+		setNotes(before.notes);
+		setFeedback(before.feedback);
+		setIssues([]);
+		setBefore(null);
+	}
+
 	async function download() {
 		if (dirty && !(await save())) return;
 		setBusy("docx");
@@ -82,6 +125,7 @@ export function Editor({ id }: { id: string }) {
 	}
 
 	const { errors, warnings } = countBySeverity(issues);
+	const hasRemarks = feedback.trim() !== "" || sectionNotes(notes).length > 0;
 
 	return (
 		<>
@@ -186,15 +230,26 @@ export function Editor({ id }: { id: string }) {
 							total={lesson.sections.length}
 							section={section}
 							issues={issues}
+							note={notes[i] ?? ""}
+							onNote={(note) => setNotes(replaceItem(notes, i, note))}
 							onChange={(next) => edit({ ...lesson, sections: replaceItem(lesson.sections, i, next) })}
-							onMove={(delta) => edit({ ...lesson, sections: moveItem(lesson.sections, i, delta) }, true)}
-							onRemove={() => edit({ ...lesson, sections: removeItem(lesson.sections, i) }, true)}
+							onMove={(delta) => {
+								edit({ ...lesson, sections: moveItem(lesson.sections, i, delta) }, true);
+								setNotes(moveItem(notes, i, delta));
+							}}
+							onRemove={() => {
+								edit({ ...lesson, sections: removeItem(lesson.sections, i) }, true);
+								setNotes(removeItem(notes, i));
+							}}
 						/>
 					))}
 				</ol>
 				<button
 					type="button"
-					onClick={() => edit({ ...lesson, sections: [...lesson.sections, emptySection()] }, true)}
+					onClick={() => {
+						edit({ ...lesson, sections: [...lesson.sections, emptySection()] }, true);
+						setNotes([...notes, ""]);
+					}}
 				>
 					+ Добавить часть
 				</button>
@@ -206,6 +261,39 @@ export function Editor({ id }: { id: string }) {
 					/>
 					Добавить прощальное стихотворение в конец занятия
 				</label>
+			</section>
+
+			<section className="sheet">
+				<h2>Поправить с помощью нейросети</h2>
+				<p className="hint">
+					Напишите, что изменить, — в общем поле или в отдельных частях («Что изменить в этой части»).
+					Нейросеть перепишет конспект с учётом ваших правок и замечаний, остальное оставит как есть.
+					Результат не сохранится, пока вы сами не нажмёте «Сохранить».
+				</p>
+				<AutoTextarea
+					aria-label="Общее пожелание"
+					rows={3}
+					placeholder="Например: сделай слова проще и добавь ещё одну игру с мячом"
+					value={feedback}
+					disabled={busy !== null}
+					onChange={(e) => setFeedback(e.target.value)}
+				/>
+				<div className="row-actions">
+					<button type="button" className="primary" disabled={busy !== null || !hasRemarks} onClick={revise}>
+						{busy === "revise" ? "Переписываем…" : "Переписать с учётом замечаний"}
+					</button>
+					{before && (
+						<button type="button" disabled={busy !== null} onClick={undoRevise}>
+							Вернуть прежний текст
+						</button>
+					)}
+				</div>
+				{busy === "revise" && (
+					<div role="status" className="progress">
+						<div className="bar" />
+						<p className="muted">Это занимает от 30 до 90 секунд.</p>
+					</div>
+				)}
 			</section>
 
 			<div className="actions">
