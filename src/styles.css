@@ -1,14 +1,18 @@
-/* An exercise book: squared paper, black ink, hard-edged sheets. No colour on purpose. */
+/* An exercise book: squared paper, ink-blue pen, a red margin line. Colour is decoration only: state is never carried by it. */
 
 :root {
 	color-scheme: light;
-	--ink: #000;
-	--paper: #fff;
-	--grid: rgb(0 0 0 / 0.08);
-	--muted: #555;
-	font-family: Georgia, "Times New Roman", serif;
-	font-size: 18px;
-	line-height: 1.5;
+	--ink: #1b2440;
+	--paper: #fffef9;
+	--desk: #f4f1e8;
+	--grid: rgb(60 90 160 / 0.12);
+	--rule: rgb(27 36 64 / 0.25);
+	--margin: #c0392b;
+	--muted: #5b6072;
+	font-family: "Literata Variable", Georgia, "Times New Roman", serif;
+	font-size: 17px;
+	line-height: 1.6;
+	font-optical-sizing: auto;
 }
 
 * {
@@ -18,7 +22,7 @@
 body {
 	margin: 0;
 	color: var(--ink);
-	background-color: var(--paper);
+	background-color: var(--desk);
 	background-image:
 		linear-gradient(var(--grid) 1px, transparent 1px),
 		linear-gradient(90deg, var(--grid) 1px, transparent 1px);
@@ -45,13 +49,16 @@ header a {
 
 h1 {
 	margin: 0;
-	font-size: 2rem;
-	border-bottom: 4px double var(--ink);
+	font-size: 1.9rem;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	border-bottom: 2px solid var(--margin);
 }
 
 h2 {
 	margin: 0 0 12px;
-	font-size: 1.3rem;
+	font-size: 1.2rem;
+	font-weight: 600;
 }
 
 a {
@@ -61,10 +68,11 @@ a {
 
 .sheet {
 	margin: 20px 0;
-	padding: 20px;
+	padding: 22px 24px;
 	background: var(--paper);
-	border: 2px solid var(--ink);
-	box-shadow: 5px 5px 0 var(--ink);
+	border: 1px solid var(--ink);
+	border-radius: 3px;
+	box-shadow: 0 1px 0 var(--rule), 0 6px 16px -8px rgb(27 36 64 / 0.3);
 }
 
 /* Controls */
@@ -83,8 +91,8 @@ textarea {
 	width: 100%;
 	padding: 8px 10px;
 	background: var(--paper);
-	border: 2px solid var(--ink);
-	border-radius: 0;
+	border: 1px solid var(--ink);
+	border-radius: 3px;
 }
 
 textarea {
@@ -94,9 +102,9 @@ textarea {
 label {
 	display: block;
 	margin-bottom: 12px;
-	font-size: 0.8rem;
-	font-weight: 700;
-	letter-spacing: 0.06em;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }
 
@@ -111,11 +119,12 @@ label > textarea {
 }
 
 button {
-	padding: 6px 14px;
+	padding: 6px 16px;
 	background: var(--paper);
-	border: 2px solid var(--ink);
-	border-radius: 0;
+	border: 1px solid var(--ink);
+	border-radius: 3px;
 	cursor: pointer;
+	transition: background-color 0.15s, color 0.15s;
 }
 
 button:hover:not(:disabled),
@@ -135,7 +144,7 @@ button:disabled {
 }
 
 :focus-visible {
-	outline: 3px solid var(--ink);
+	outline: 2px solid var(--margin);
 	outline-offset: 2px;
 }
 
@@ -171,8 +180,8 @@ fieldset:disabled {
 .error-text {
 	margin: 12px 0;
 	padding-left: 10px;
-	border-left: 6px solid var(--ink);
-	font-weight: 700;
+	border-left: 5px solid var(--ink);
+	font-weight: 600;
 }
 
 .summary {
@@ -197,7 +206,8 @@ fieldset:disabled {
 .tag {
 	display: inline-block;
 	padding: 0 6px;
-	border: 2px solid var(--ink);
+	border: 1px solid var(--ink);
+	border-radius: 2px;
 	font-size: 0.7rem;
 	font-weight: 700;
 	letter-spacing: 0.06em;
@@ -227,7 +237,7 @@ fieldset:disabled {
 	gap: 12px;
 	align-items: baseline;
 	padding: 10px 0;
-	border-bottom: 1px dashed var(--ink);
+	border-bottom: 1px solid var(--rule);
 }
 
 .lessons a {
@@ -248,7 +258,8 @@ fieldset:disabled {
 	height: 2rem;
 	background: var(--ink);
 	color: var(--paper);
-	font-weight: 700;
+	border-radius: 50%;
+	font-weight: 600;
 }
 
 .objective {
@@ -270,12 +281,15 @@ fieldset:disabled {
 .card {
 	display: grid;
 	gap: 10px;
-	padding: 14px;
-	border: 2px solid var(--ink);
+	padding: 14px 16px;
+	border: 1px solid var(--rule);
+	border-left: 3px solid var(--margin);
+	border-radius: 3px;
 }
 
 .card.has-error {
-	border-width: 5px;
+	border-color: var(--ink);
+	border-left-width: 6px;
 }
 
 .card-head {
@@ -320,7 +334,7 @@ fieldset:disabled {
 	margin: 0 -16px;
 	padding: 12px 16px;
 	background: var(--paper);
-	border-top: 2px solid var(--ink);
+	border-top: 1px solid var(--ink);
 }
 
 .status {
@@ -339,7 +353,7 @@ fieldset:disabled {
 
 .progress .bar {
 	height: 14px;
-	border: 2px solid var(--ink);
+	border: 1px solid var(--ink);
 	background: repeating-linear-gradient(45deg, var(--ink) 0 10px, var(--paper) 10px 20px);
 	background-size: 28px 28px;
 	animation: slide 1s linear infinite;

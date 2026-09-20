@@ -11,6 +11,7 @@
 		"check": "tsc -b && vitest run"
 	},
 	"dependencies": {
+		"@fontsource-variable/literata": "^5.3.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0"
 	},
