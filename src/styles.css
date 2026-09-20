@@ -1,0 +1,383 @@
+/* An exercise book: squared paper, black ink, hard-edged sheets. No colour on purpose. */
+
+:root {
+	color-scheme: light;
+	--ink: #000;
+	--paper: #fff;
+	--grid: rgb(0 0 0 / 0.08);
+	--muted: #555;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 18px;
+	line-height: 1.5;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	color: var(--ink);
+	background-color: var(--paper);
+	background-image:
+		linear-gradient(var(--grid) 1px, transparent 1px),
+		linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+	background-size: 24px 24px;
+}
+
+#root {
+	max-width: 46rem;
+	margin: 0 auto;
+	padding: 0 16px 4rem;
+}
+
+header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 24px 0 8px;
+}
+
+header a {
+	color: inherit;
+	text-decoration: none;
+}
+
+h1 {
+	margin: 0;
+	font-size: 2rem;
+	border-bottom: 4px double var(--ink);
+}
+
+h2 {
+	margin: 0 0 12px;
+	font-size: 1.3rem;
+}
+
+a {
+	color: var(--ink);
+	text-underline-offset: 3px;
+}
+
+.sheet {
+	margin: 20px 0;
+	padding: 20px;
+	background: var(--paper);
+	border: 2px solid var(--ink);
+	box-shadow: 5px 5px 0 var(--ink);
+}
+
+/* Controls */
+
+input,
+select,
+textarea,
+button {
+	font: inherit;
+	color: inherit;
+}
+
+input,
+select,
+textarea {
+	width: 100%;
+	padding: 8px 10px;
+	background: var(--paper);
+	border: 2px solid var(--ink);
+	border-radius: 0;
+}
+
+textarea {
+	resize: vertical;
+}
+
+label {
+	display: block;
+	margin-bottom: 12px;
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+label > input,
+label > select,
+label > textarea {
+	margin-top: 4px;
+	font-size: 1rem;
+	font-weight: 400;
+	letter-spacing: normal;
+	text-transform: none;
+}
+
+button {
+	padding: 6px 14px;
+	background: var(--paper);
+	border: 2px solid var(--ink);
+	border-radius: 0;
+	cursor: pointer;
+}
+
+button:hover:not(:disabled),
+button.primary {
+	background: var(--ink);
+	color: var(--paper);
+}
+
+button.primary:hover:not(:disabled) {
+	background: var(--paper);
+	color: var(--ink);
+}
+
+button:disabled {
+	opacity: 0.35;
+	cursor: not-allowed;
+}
+
+:focus-visible {
+	outline: 3px solid var(--ink);
+	outline-offset: 2px;
+}
+
+fieldset {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+fieldset:disabled {
+	opacity: 0.6;
+}
+
+.row {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	gap: 16px;
+}
+
+/* Text */
+
+.muted {
+	color: var(--muted);
+	font-weight: 400;
+}
+
+.hint {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.85rem;
+}
+
+.error-text {
+	margin: 12px 0;
+	padding-left: 10px;
+	border-left: 6px solid var(--ink);
+	font-weight: 700;
+}
+
+.summary {
+	margin: 8px 0 0;
+	font-weight: 700;
+}
+
+.back {
+	display: inline-block;
+	margin-top: 12px;
+}
+
+/* Validation: errors are white on black, warnings outlined, so neither needs colour. */
+
+.issues {
+	margin: 6px 0;
+	padding: 0;
+	list-style: none;
+	font-size: 0.9rem;
+}
+
+.tag {
+	display: inline-block;
+	padding: 0 6px;
+	border: 2px solid var(--ink);
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.tag.error {
+	background: var(--ink);
+	color: var(--paper);
+}
+
+.invalid {
+	padding: 6px 8px;
+	border-width: 4px;
+}
+
+/* Lessons list */
+
+.lessons {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.lessons li {
+	display: flex;
+	gap: 12px;
+	align-items: baseline;
+	padding: 10px 0;
+	border-bottom: 1px dashed var(--ink);
+}
+
+.lessons a {
+	flex: 1;
+}
+
+.lesson-number {
+	font-weight: 700;
+}
+
+/* Editor */
+
+.number {
+	display: inline-grid;
+	place-items: center;
+	flex: none;
+	min-width: 2rem;
+	height: 2rem;
+	background: var(--ink);
+	color: var(--paper);
+	font-weight: 700;
+}
+
+.objective {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	gap: 8px;
+	align-items: start;
+	margin-bottom: 8px;
+}
+
+.cards {
+	display: grid;
+	gap: 16px;
+	margin: 0 0 16px;
+	padding: 0;
+	list-style: none;
+}
+
+.card {
+	display: grid;
+	gap: 10px;
+	padding: 14px;
+	border: 2px solid var(--ink);
+}
+
+.card.has-error {
+	border-width: 5px;
+}
+
+.card-head {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.card-head select {
+	width: auto;
+}
+
+.spacer {
+	flex: 1;
+}
+
+.check {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin: 16px 0 0;
+	font-size: 1rem;
+	font-weight: 400;
+	letter-spacing: normal;
+	text-transform: none;
+}
+
+.check input {
+	width: 1.3rem;
+	height: 1.3rem;
+	margin: 0;
+	accent-color: var(--ink);
+}
+
+.actions {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin: 0 -16px;
+	padding: 12px 16px;
+	background: var(--paper);
+	border-top: 2px solid var(--ink);
+}
+
+.status {
+	flex: 1;
+}
+
+.status .error-text {
+	margin: 0;
+}
+
+/* Generating */
+
+.progress {
+	margin-top: 16px;
+}
+
+.progress .bar {
+	height: 14px;
+	border: 2px solid var(--ink);
+	background: repeating-linear-gradient(45deg, var(--ink) 0 10px, var(--paper) 10px 20px);
+	background-size: 28px 28px;
+	animation: slide 1s linear infinite;
+}
+
+@keyframes slide {
+	to {
+		background-position: 28px 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.progress .bar {
+		animation: none;
+	}
+}
+
+.login {
+	max-width: 24rem;
+	margin: 3rem auto;
+}
+
+@media (max-width: 34rem) {
+	.row {
+		grid-template-columns: 1fr;
+		gap: 0;
+	}
+
+	.objective {
+		grid-template-columns: auto 1fr;
+	}
+
+	.objective button {
+		grid-column: 2;
+		justify-self: start;
+	}
+
+	.actions {
+		flex-wrap: wrap;
+	}
+}
