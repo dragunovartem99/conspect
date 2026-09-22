@@ -2,7 +2,9 @@ import { Icon } from "../Icon";
 import type { Issue, Section, SectionKind } from "../api/types";
 import { AutoTextarea } from "./AutoTextarea";
 import { IssueList } from "./IssueList";
-import { issuesAt, KIND_LABELS } from "./issues";
+import { issuesAt } from "./issues";
+import { KIND_LABELS } from "./labels";
+import { LinesTextarea } from "./LinesTextarea";
 
 interface Props {
 	index: number;
@@ -66,12 +68,12 @@ export function SectionCard({ index, total, section, issues, note, onNote, onCha
 			/>
 			<IssueList issues={titleIssues} />
 
-			<AutoTextarea
+			<LinesTextarea
 				aria-label="Текст части"
 				rows={3}
 				placeholder="Каждый абзац — с новой строки"
-				value={section.paragraphs.join("\n")}
-				onChange={(e) => onChange({ ...section, paragraphs: e.target.value.split("\n") })}
+				value={section.paragraphs}
+				onChange={(paragraphs) => onChange({ ...section, paragraphs })}
 			/>
 			<IssueList issues={own} />
 

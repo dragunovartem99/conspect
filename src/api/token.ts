@@ -4,6 +4,14 @@ const KEY = "conspect.token";
 // should still last until the tab is closed.
 let memory: string | null = null;
 
+const listeners = new Set<() => void>();
+
+/** Called whenever the token is set or cleared, e.g. when the server rejects it. */
+export function subscribeToken(listener: () => void): () => void {
+	listeners.add(listener);
+	return () => listeners.delete(listener);
+}
+
 export function getToken(): string | null {
 	if (memory) return memory;
 	try {
@@ -20,6 +28,7 @@ export function setToken(token: string): void {
 	} catch {
 		// Nothing to do: the in-memory copy is enough for this tab.
 	}
+	listeners.forEach((listener) => listener());
 }
 
 export function clearToken(): void {
@@ -29,4 +38,5 @@ export function clearToken(): void {
 	} catch {
 		// Same as above.
 	}
+	listeners.forEach((listener) => listener());
 }

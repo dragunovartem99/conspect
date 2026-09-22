@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import { logout, onSignedOut } from "./api/client";
-import { getToken } from "./api/token";
+import { useSyncExternalStore } from "react";
+import { logout } from "./api/client";
+import { getToken, subscribeToken } from "./api/token";
 import { listPath, parseRoute, useHash } from "./router";
 import { Editor } from "./screens/Editor";
 import { Lessons } from "./screens/Lessons";
 import { Login } from "./screens/Login";
 
-export function App() {
-	const [signedIn, setSignedIn] = useState(() => getToken() !== null);
-	const route = parseRoute(useHash());
+const isSignedIn = () => getToken() !== null;
 
-	useEffect(() => onSignedOut(() => setSignedIn(false)), []);
+export function App() {
+	const signedIn = useSyncExternalStore(subscribeToken, isSignedIn);
+	const route = parseRoute(useHash());
 
 	return (
 		<>
@@ -26,9 +26,9 @@ export function App() {
 			</header>
 			<main>
 				{!signedIn ? (
-					<Login onSignedIn={() => setSignedIn(true)} />
+					<Login />
 				) : route.name === "lesson" ? (
-					<Editor id={route.id} />
+					<Editor key={route.id} id={route.id} />
 				) : (
 					<Lessons />
 				)}

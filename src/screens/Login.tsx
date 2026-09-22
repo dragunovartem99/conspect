@@ -1,22 +1,15 @@
 import { useState, type FormEvent } from "react";
-import { ApiError, login } from "../api/client";
+import { login } from "../api/client";
+import { useAction } from "../hooks";
 
-export function Login({ onSignedIn }: { onSignedIn: () => void }) {
+/** Signing in stores the token, which by itself takes the app past this screen. */
+export function Login() {
 	const [password, setPassword] = useState("");
-	const [busy, setBusy] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const { busy, error, run } = useAction<"login">();
 
-	async function submit(event: FormEvent) {
+	function submit(event: FormEvent) {
 		event.preventDefault();
-		setBusy(true);
-		setError(null);
-		try {
-			await login(password);
-			onSignedIn();
-		} catch (e) {
-			setError(e instanceof ApiError && e.status === 401 ? "Неверный пароль." : message(e));
-			setBusy(false);
-		}
+		void run("login", () => login(password), { leaves: true });
 	}
 
 	return (
@@ -33,12 +26,9 @@ export function Login({ onSignedIn }: { onSignedIn: () => void }) {
 				/>
 			</label>
 			{error && <p className="error-text" role="alert">{error}</p>}
-			<button className="primary" disabled={busy || !password}>
+			<button className="primary" disabled={busy !== null || !password}>
 				{busy ? "Входим…" : "Войти"}
 			</button>
 		</form>
 	);
 }
-
-export const message = (e: unknown): string =>
-	e instanceof Error ? e.message : "Что-то пошло не так.";

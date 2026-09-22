@@ -1,11 +1,7 @@
+import createClient from "openapi-fetch";
+import type { paths } from "./schema";
 import { clearToken, getToken, setToken } from "./token";
-import type {
-	GenerateRequest,
-	Lesson,
-	LessonSummary,
-	LessonWithIssues,
-	ReviseRequest,
-} from "./types";
+import type { GenerateRequest, Lesson, ReviseRequest } from "./types";
 
 const API_URL: string =
 	import.meta.env.VITE_API_URL ??
@@ -20,86 +16,72 @@ export class ApiError extends Error {
 	}
 }
 
-const signedOutListeners = new Set<() => void>();
+/** Text to show for any error thrown by the calls below (or anything else). */
+export const message = (e: unknown): string => (e instanceof Error ? e.message : "Что-то пошло не так.");
 
-/** Called when the server rejects the stored token, so the app can show the login screen. */
-export function onSignedOut(listener: () => void): () => void {
-	signedOutListeners.add(listener);
-	return () => signedOutListeners.delete(listener);
-}
+const api = createClient<paths>({
+	baseUrl: API_URL,
+	// Looked up on each call rather than captured once, so tests can stub it.
+	fetch: (request) => globalThis.fetch(request),
+});
 
-async function errorMessage(res: Response): Promise<string> {
-	try {
-		const body: unknown = await res.json();
-		if (typeof body === "object" && body && "detail" in body && typeof body.detail === "string") {
-			return body.detail;
-		}
-	} catch {
-		// Not JSON: fall through to the generic messages.
+api.use({
+	onRequest({ request, schemaPath }) {
+		const token = getToken();
+		if (token && schemaPath !== "/api/login") request.headers.set("authorization", `Bearer ${token}`);
+		return request;
+	},
+	onResponse({ request, response }) {
+		// The server rejected the stored token: signing out shows the login screen.
+		if (response.status === 401 && request.headers.has("authorization")) clearToken();
+	},
+	onError() {
+		return new ApiError(0, "Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.");
+	},
+});
+
+function detail(error: unknown, status: number): string {
+	if (typeof error === "object" && error && "detail" in error && typeof error.detail === "string") {
+		return error.detail;
 	}
-	return res.status === 422 ? "Проверьте введённые данные." : `Ошибка сервера (${res.status}).`;
+	return status === 422 ? "Проверьте введённые данные." : `Ошибка сервера (${status}).`;
 }
 
-async function request(path: string, init: RequestInit = {}, signedIn = true): Promise<Response> {
-	const headers = new Headers(init.headers);
-	if (init.body) headers.set("content-type", "application/json");
-	const token = getToken();
-	if (signedIn && token) headers.set("authorization", `Bearer ${token}`);
-
-	let res: Response;
-	try {
-		res = await fetch(API_URL + path, { ...init, headers });
-	} catch {
-		throw new ApiError(0, "Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.");
-	}
-	if (!res.ok) {
-		if (res.status === 401 && signedIn) {
-			clearToken();
-			signedOutListeners.forEach((listener) => listener());
-		}
-		throw new ApiError(res.status, await errorMessage(res));
-	}
-	return res;
+/** The response body, or an ApiError with the server's message. */
+async function unwrap<T>(pending: Promise<{ data?: T; error?: unknown; response: Response }>): Promise<T> {
+	const { data, error, response } = await pending;
+	if (!response.ok) throw new ApiError(response.status, detail(error, response.status));
+	return data as T;
 }
 
-async function json<T>(path: string, init?: RequestInit): Promise<T> {
-	return (await request(path, init)).json() as Promise<T>;
-}
+const lessonPath = (id: string) => ({ params: { path: { lesson_id: id } } });
 
 export async function login(password: string): Promise<void> {
-	const res = await request(
-		"/api/login",
-		{ method: "POST", body: JSON.stringify({ password }) },
-		false,
-	);
-	const body = (await res.json()) as { token: string };
-	setToken(body.token);
+	try {
+		const { token } = await unwrap(api.POST("/api/login", { body: { password } }));
+		setToken(token);
+	} catch (e) {
+		throw e instanceof ApiError && e.status === 401 ? new ApiError(401, "Неверный пароль.") : e;
+	}
 }
 
-export function logout(): void {
-	clearToken();
-	signedOutListeners.forEach((listener) => listener());
-}
+export const logout = clearToken;
 
-export const listLessons = () => json<LessonSummary[]>("/api/lessons");
+export const listLessons = () => unwrap(api.GET("/api/lessons"));
 
-export const generateLesson = (body: GenerateRequest) =>
-	json<LessonWithIssues>("/api/lessons/generate", { method: "POST", body: JSON.stringify(body) });
+export const generateLesson = (body: GenerateRequest) => unwrap(api.POST("/api/lessons/generate", { body }));
 
-export const getLesson = (id: string) => json<LessonWithIssues>(`/api/lessons/${id}`);
+export const getLesson = (id: string) => unwrap(api.GET("/api/lessons/{lesson_id}", lessonPath(id)));
 
 export const updateLesson = (lesson: Lesson) =>
-	json<LessonWithIssues>(`/api/lessons/${lesson.id}`, {
-		method: "PUT",
-		body: JSON.stringify(lesson),
-	});
+	unwrap(api.PUT("/api/lessons/{lesson_id}", { ...lessonPath(lesson.id), body: lesson }));
 
 /** Returns a rewrite for review; the server saves nothing until the editor's own save. */
 export const reviseLesson = (id: string, body: ReviseRequest) =>
-	json<LessonWithIssues>(`/api/lessons/${id}/revise`, { method: "POST", body: JSON.stringify(body) });
+	unwrap(api.POST("/api/lessons/{lesson_id}/revise", { ...lessonPath(id), body }));
 
 export async function deleteLesson(id: string): Promise<void> {
-	await request(`/api/lessons/${id}`, { method: "DELETE" });
+	await unwrap(api.DELETE("/api/lessons/{lesson_id}", lessonPath(id)));
 }
 
 export function filenameFromDisposition(header: string | null): string {
@@ -114,13 +96,10 @@ export function filenameFromDisposition(header: string | null): string {
 	return (header && /filename="([^"]+)"/i.exec(header)?.[1]) || "konspekt.docx";
 }
 
-/** The file needs the token, so it is fetched and handed to the browser as a blob. */
-export async function downloadDocx(id: string): Promise<void> {
-	const res = await request(`/api/lessons/${id}/docx`);
-	const blob = await res.blob();
-	const link = document.createElement("a");
-	link.href = URL.createObjectURL(blob);
-	link.download = filenameFromDisposition(res.headers.get("content-disposition"));
-	link.click();
-	URL.revokeObjectURL(link.href);
+/** The file needs the token, so it is fetched as a blob rather than linked to. */
+export async function getDocx(id: string): Promise<{ blob: Blob; filename: string }> {
+	const pending = api.GET("/api/lessons/{lesson_id}/docx", { ...lessonPath(id), parseAs: "blob" });
+	const blob = await unwrap(pending);
+	const { response } = await pending;
+	return { blob, filename: filenameFromDisposition(response.headers.get("content-disposition")) };
 }

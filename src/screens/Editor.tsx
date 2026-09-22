@@ -1,53 +1,34 @@
-import { useEffect, useState } from "react";
-import { downloadDocx, getLesson, reviseLesson, updateLesson } from "../api/client";
-import type { Issue, Lesson } from "../api/types";
+import { useEffect, useReducer } from "react";
+import { getDocx, getLesson, reviseLesson, updateLesson } from "../api/client";
+import type { LessonWithIssues } from "../api/types";
 import { AutoTextarea } from "../editor/AutoTextarea";
-import { cleanLesson, emptySection, sectionNotes, moveItem, removeItem, replaceItem, snapshot } from "../editor/edit";
+import { cleanLesson, replaceItem, sectionNotes } from "../editor/edit";
 import { IssueList } from "../editor/IssueList";
 import { countBySeverity, issuesAt } from "../editor/issues";
-import { MONTHS } from "../editor/months";
+import { MONTHS } from "../editor/labels";
+import { LinesTextarea } from "../editor/LinesTextarea";
 import { SectionCard } from "../editor/SectionCard";
+import { editorReducer, initEditor, isDirty, partNotes, toLesson } from "../editor/state";
+import { useAction, useLoad } from "../hooks";
 import { Icon } from "../Icon";
+import { Progress } from "../Progress";
 import { listPath } from "../router";
-import { message } from "./Login";
+import { saveFile } from "../saveFile";
 
+/** Loads the lesson; render it with `key={id}` so another lesson starts from scratch. */
 export function Editor({ id }: { id: string }) {
-	const [lesson, setLesson] = useState<Lesson | null>(null);
-	const [saved, setSaved] = useState("");
-	const [issues, setIssues] = useState<Issue[]>([]);
-	const [error, setError] = useState<string | null>(null);
-	const [busy, setBusy] = useState<"save" | "docx" | "revise" | null>(null);
-	/** Remarks for the next rewrite: one per part, in the parts' order, plus one for the whole lesson. */
-	const [notes, setNotes] = useState<string[]>([]);
-	const [feedback, setFeedback] = useState("");
-	/** The text from before the last rewrite, so a bad rewrite can be undone. */
-	const [before, setBefore] = useState<{ lesson: Lesson; notes: string[]; feedback: string } | null>(null);
+	const { data, error } = useLoad(() => getLesson(id));
+	if (error) return <p className="error-text" role="alert">{error}</p>;
+	if (!data) return <p className="muted">Загрузка…</p>;
+	return <LessonEditor initial={data} />;
+}
 
-	function accept(result: { lesson: Lesson; issues: Issue[] }) {
-		setLesson(result.lesson);
-		setSaved(snapshot(result.lesson));
-		setIssues(result.issues);
-	}
-
-	useEffect(() => {
-		let cancelled = false;
-		setLesson(null);
-		setError(null);
-		getLesson(id)
-			.then((result) => {
-				if (cancelled) return;
-				accept(result);
-				setNotes(result.lesson.sections.map(() => ""));
-				setFeedback("");
-				setBefore(null);
-			})
-			.catch((e) => !cancelled && setError(message(e)));
-		return () => {
-			cancelled = true;
-		};
-	}, [id]);
-
-	const dirty = lesson !== null && snapshot(lesson) !== saved;
+function LessonEditor({ initial }: { initial: LessonWithIssues }) {
+	const [state, dispatch] = useReducer(editorReducer, initial, initEditor);
+	const { busy, error, run } = useAction<"save" | "docx" | "revise">();
+	const { fields, parts, issues, feedback } = state;
+	const id = fields.id;
+	const dirty = isDirty(state);
 
 	useEffect(() => {
 		if (!dirty) return;
@@ -56,76 +37,30 @@ export function Editor({ id }: { id: string }) {
 		return () => window.removeEventListener("beforeunload", warn);
 	}, [dirty]);
 
-	if (error && !lesson) return <p className="error-text" role="alert">{error}</p>;
-	if (!lesson) return <p className="muted">Загрузка…</p>;
+	const save = () =>
+		run("save", async () => dispatch({ type: "saved", result: await updateLesson(cleanLesson(toLesson(state))) }));
 
-	/** Issue paths are positions, so adding, removing or moving parts makes them stale. */
-	function edit(next: Lesson, structural = false) {
-		setLesson(next);
-		if (structural) setIssues([]);
-	}
-
-	async function save(): Promise<boolean> {
-		if (!lesson) return false;
-		setBusy("save");
-		setError(null);
-		try {
-			accept(await updateLesson(cleanLesson(lesson)));
-			return true;
-		} catch (e) {
-			setError(message(e));
-			return false;
-		} finally {
-			setBusy(null);
-		}
-	}
-
-	async function revise() {
-		if (!lesson) return;
-		setBusy("revise");
-		setError(null);
-		try {
+	const revise = () =>
+		run("revise", async () => {
 			const result = await reviseLesson(id, {
-				lesson: cleanLesson(lesson),
+				lesson: cleanLesson(toLesson(state)),
 				feedback: feedback.trim(),
-				sections: sectionNotes(notes),
+				sections: sectionNotes(partNotes(state)),
 			});
-			setBefore({ lesson, notes, feedback });
-			// Not saved: it shows as an unsaved change until the teacher accepts it.
-			setLesson(result.lesson);
-			setIssues(result.issues);
-			setNotes(result.lesson.sections.map(() => ""));
-			setFeedback("");
-		} catch (e) {
-			setError(message(e));
-		} finally {
-			setBusy(null);
-		}
-	}
-
-	function undoRevise() {
-		if (!before) return;
-		setLesson(before.lesson);
-		setNotes(before.notes);
-		setFeedback(before.feedback);
-		setIssues([]);
-		setBefore(null);
-	}
+			dispatch({ type: "revised", result });
+		});
 
 	async function download() {
 		if (dirty && !(await save())) return;
-		setBusy("docx");
-		try {
-			await downloadDocx(id);
-		} catch (e) {
-			setError(message(e));
-		} finally {
-			setBusy(null);
-		}
+		await run("docx", async () => {
+			const { blob, filename } = await getDocx(id);
+			saveFile(blob, filename);
+		});
 	}
 
 	const { errors, warnings } = countBySeverity(issues);
-	const hasRemarks = feedback.trim() !== "" || sectionNotes(notes).length > 0;
+	const equipmentIssues = issuesAt(issues, "equipment");
+	const hasRemarks = feedback.trim() !== "" || sectionNotes(partNotes(state)).length > 0;
 
 	return (
 		<>
@@ -134,12 +69,15 @@ export function Editor({ id }: { id: string }) {
 			</a>
 
 			<section className="sheet">
-				<h2>Конспект №{lesson.number}</h2>
+				<h2>Конспект №{fields.number}</h2>
 				<div className="row">
 					<label>
 						Месяц
-						<select value={lesson.month} onChange={(e) => edit({ ...lesson, month: e.target.value })}>
-							{(MONTHS.includes(lesson.month) ? MONTHS : [lesson.month, ...MONTHS]).map((m) => (
+						<select
+							value={fields.month}
+							onChange={(e) => dispatch({ type: "fieldsChanged", fields: { month: e.target.value } })}
+						>
+							{(MONTHS.includes(fields.month) ? MONTHS : [fields.month, ...MONTHS]).map((m) => (
 								<option key={m}>{m}</option>
 							))}
 						</select>
@@ -149,20 +87,23 @@ export function Editor({ id }: { id: string }) {
 						<input
 							type="number"
 							min={1}
-							value={lesson.number}
-							onChange={(e) => edit({ ...lesson, number: Number(e.target.value) })}
+							value={fields.number}
+							onChange={(e) => dispatch({ type: "fieldsChanged", fields: { number: Number(e.target.value) } })}
 						/>
 					</label>
 				</div>
 				<label>
 					Тема
-					<input value={lesson.topic} onChange={(e) => edit({ ...lesson, topic: e.target.value })} />
+					<input
+						value={fields.topic}
+						onChange={(e) => dispatch({ type: "fieldsChanged", fields: { topic: e.target.value } })}
+					/>
 				</label>
 				<label>
 					Персонаж-сюрприз
 					<input
-						value={lesson.character ?? ""}
-						onChange={(e) => edit({ ...lesson, character: e.target.value })}
+						value={fields.character ?? ""}
+						onChange={(e) => dispatch({ type: "fieldsChanged", fields: { character: e.target.value } })}
 					/>
 				</label>
 				{issues.length > 0 && (
@@ -175,82 +116,70 @@ export function Editor({ id }: { id: string }) {
 			<section className="sheet">
 				<h2>Программное содержание</h2>
 				<IssueList issues={issuesAt(issues, "objectives")} />
-				{lesson.objectives.map((objective, i) => (
-					<div key={i}>
-						<div className="objective">
-							<span className="number">{i + 1}</span>
-							<AutoTextarea
-								aria-label={`Цель ${i + 1}`}
-								rows={3}
-								className={issuesAt(issues, `objectives[${i}]`).length ? "invalid" : ""}
-								value={objective}
-								onChange={(e) =>
-									edit({ ...lesson, objectives: replaceItem(lesson.objectives, i, e.target.value) })
-								}
-							/>
-							<button
-								type="button"
-								onClick={() => edit({ ...lesson, objectives: removeItem(lesson.objectives, i) }, true)}
-							>
-								Удалить
-							</button>
+				{fields.objectives.map((objective, i) => {
+					const own = issuesAt(issues, `objectives[${i}]`);
+					return (
+						<div key={i}>
+							<div className="objective">
+								<span className="number">{i + 1}</span>
+								<AutoTextarea
+									aria-label={`Цель ${i + 1}`}
+									rows={3}
+									className={own.length ? "invalid" : ""}
+									value={objective}
+									onChange={(e) =>
+										dispatch({
+											type: "fieldsChanged",
+											fields: { objectives: replaceItem(fields.objectives, i, e.target.value) },
+										})
+									}
+								/>
+								<button type="button" onClick={() => dispatch({ type: "objectiveRemoved", index: i })}>
+									Удалить
+								</button>
+							</div>
+							<IssueList issues={own} />
 						</div>
-						<IssueList issues={issuesAt(issues, `objectives[${i}]`)} />
-					</div>
-				))}
-				<button
-					type="button"
-					onClick={() => edit({ ...lesson, objectives: [...lesson.objectives, ""] }, true)}
-				>
+					);
+				})}
+				<button type="button" onClick={() => dispatch({ type: "objectiveAdded" })}>
 					+ Добавить цель
 				</button>
 			</section>
 
 			<section className="sheet">
 				<h2>Оборудование</h2>
-				<AutoTextarea
+				<LinesTextarea
 					aria-label="Оборудование"
 					rows={3}
-					className={issuesAt(issues, "equipment").length ? "invalid" : ""}
+					className={equipmentIssues.length ? "invalid" : ""}
 					placeholder="Каждый предмет — с новой строки"
-					value={lesson.equipment.join("\n")}
-					onChange={(e) => edit({ ...lesson, equipment: e.target.value.split("\n") })}
+					value={fields.equipment}
+					onChange={(equipment) => dispatch({ type: "fieldsChanged", fields: { equipment } })}
 				/>
-				<IssueList issues={issuesAt(issues, "equipment")} />
+				<IssueList issues={equipmentIssues} />
 			</section>
 
 			<section className="sheet">
 				<h2>Ход занятия</h2>
 				<IssueList issues={issuesAt(issues, "sections")} />
 				<ol className="cards">
-					{lesson.sections.map((section, i) => (
+					{parts.map((part, i) => (
 						<SectionCard
-							key={i}
+							key={part.key}
 							index={i}
-							total={lesson.sections.length}
-							section={section}
+							total={parts.length}
+							section={part.section}
 							issues={issues}
-							note={notes[i] ?? ""}
-							onNote={(note) => setNotes(replaceItem(notes, i, note))}
-							onChange={(next) => edit({ ...lesson, sections: replaceItem(lesson.sections, i, next) })}
-							onMove={(delta) => {
-								edit({ ...lesson, sections: moveItem(lesson.sections, i, delta) }, true);
-								setNotes(moveItem(notes, i, delta));
-							}}
-							onRemove={() => {
-								edit({ ...lesson, sections: removeItem(lesson.sections, i) }, true);
-								setNotes(removeItem(notes, i));
-							}}
+							note={part.note}
+							onNote={(note) => dispatch({ type: "noteChanged", index: i, note })}
+							onChange={(section) => dispatch({ type: "sectionChanged", index: i, section })}
+							onMove={(delta) => dispatch({ type: "sectionMoved", index: i, delta })}
+							onRemove={() => dispatch({ type: "sectionRemoved", index: i })}
 						/>
 					))}
 				</ol>
-				<button
-					type="button"
-					onClick={() => {
-						edit({ ...lesson, sections: [...lesson.sections, emptySection()] }, true);
-						setNotes([...notes, ""]);
-					}}
-				>
+				<button type="button" onClick={() => dispatch({ type: "sectionAdded" })}>
 					+ Добавить часть
 				</button>
 			</section>
@@ -268,24 +197,19 @@ export function Editor({ id }: { id: string }) {
 					placeholder="Например: сделай слова проще и добавь ещё одну игру с мячом"
 					value={feedback}
 					disabled={busy !== null}
-					onChange={(e) => setFeedback(e.target.value)}
+					onChange={(e) => dispatch({ type: "feedbackChanged", feedback: e.target.value })}
 				/>
 				<div className="row-actions">
 					<button type="button" className="primary" disabled={busy !== null || !hasRemarks} onClick={revise}>
 						{busy === "revise" ? "Переписываем…" : "Переписать с учётом замечаний"}
 					</button>
-					{before && (
-						<button type="button" disabled={busy !== null} onClick={undoRevise}>
+					{state.before && (
+						<button type="button" disabled={busy !== null} onClick={() => dispatch({ type: "undone" })}>
 							Вернуть прежний текст
 						</button>
 					)}
 				</div>
-				{busy === "revise" && (
-					<div role="status" className="progress">
-						<div className="bar" />
-						<p className="muted">Это занимает от 30 до 90 секунд.</p>
-					</div>
-				)}
+				{busy === "revise" && <Progress />}
 			</section>
 
 			<div className="actions">

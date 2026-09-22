@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { ApiError, filenameFromDisposition, getLesson, login, onSignedOut } from "./client";
-import { clearToken, getToken } from "./token";
+import { ApiError, filenameFromDisposition, getLesson, login } from "./client";
+import { clearToken, getToken, subscribeToken } from "./token";
 
 function stubFetch(status: number, body: unknown) {
 	const fetchMock = vi.fn(async () => new Response(JSON.stringify(body), { status }));
@@ -9,7 +9,7 @@ function stubFetch(status: number, body: unknown) {
 }
 
 const headersOf = (fetchMock: ReturnType<typeof stubFetch>) =>
-	new Headers((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].headers);
+	(fetchMock.mock.calls[0] as unknown as [Request])[0].headers;
 
 beforeEach(() => clearToken());
 afterEach(() => vi.unstubAllGlobals());
@@ -36,13 +36,18 @@ it("signs out when the server rejects the token", async () => {
 	stubFetch(200, { token: "t0k" });
 	await login("secret");
 	const signedOut = vi.fn();
-	const stop = onSignedOut(signedOut);
+	const stop = subscribeToken(signedOut);
 
 	stubFetch(401, { detail: "Sign in required." });
 	await expect(getLesson("abc")).rejects.toBeInstanceOf(ApiError);
 	expect(signedOut).toHaveBeenCalledOnce();
 	expect(getToken()).toBeNull();
 	stop();
+});
+
+it("says so when the password is wrong", async () => {
+	stubFetch(401, { detail: "Wrong password." });
+	await expect(login("nope")).rejects.toThrow("Неверный пароль.");
 });
 
 it("shows the server's message, and a Russian one when the server is unreachable", async () => {

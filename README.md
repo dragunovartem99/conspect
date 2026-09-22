@@ -12,13 +12,14 @@ The web app for a lesson-plan (конспект) generator for a kindergarten te
 
 ## Stack
 
-React + Vite + TypeScript, plain `fetch` (`src/api/client.ts`), a hash-based router with two screens (`src/router.ts`), no external router, no state library, no UI kit. The interface is in Russian. Black and white on squared paper, on purpose.
+React + Vite + TypeScript, `openapi-fetch` typed from the generated schema (`src/api/client.ts`), a hash-based router with two screens (`src/router.ts`), no external router, no state library, no UI kit. The interface is in Russian. Black and white on squared paper, on purpose.
 
 ## Project layout
 
 ```
-src/api/       fetch client, auth token storage, generated API types (schema.d.ts)
-src/editor/    section cards, per-field issue list, auto-growing textarea, edit helpers
+src/api/       typed API client, auth token store, generated API types (schema.d.ts)
+src/editor/    editor state (reducer), section cards, per-field issue list, textareas, labels, edit helpers
+src/hooks.ts   useLoad (fetch on mount) and useAction (busy + error for a button)
 src/screens/   Login, Lessons (list + new-lesson form), Editor
 ```
 

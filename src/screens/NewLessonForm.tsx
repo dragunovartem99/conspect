@@ -1,34 +1,24 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { generateLesson } from "../api/client";
 import { AutoTextarea } from "../editor/AutoTextarea";
-import { MONTHS } from "../editor/months";
+import { MONTHS } from "../editor/labels";
+import { useAction } from "../hooks";
+import { Progress } from "../Progress";
 import { lessonPath } from "../router";
-import { message } from "./Login";
 
 export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 	const [month, setMonth] = useState(MONTHS[new Date().getMonth()] ?? "");
-	const [number, setNumber] = useState(nextNumber);
+	/** Null until the teacher types a number: until then it follows the suggested one. */
+	const [typedNumber, setTypedNumber] = useState<number | null>(null);
 	const [topic, setTopic] = useState("");
 	const [character, setCharacter] = useState("");
 	const [brief, setBrief] = useState("");
-	const [busy, setBusy] = useState(false);
-	const [seconds, setSeconds] = useState(0);
-	const [error, setError] = useState<string | null>(null);
+	const { busy, error, run } = useAction<"generate">();
+	const number = typedNumber ?? nextNumber;
 
-	useEffect(() => setNumber(nextNumber), [nextNumber]);
-
-	useEffect(() => {
-		if (!busy) return;
-		setSeconds(0);
-		const timer = setInterval(() => setSeconds((s) => s + 1), 1000);
-		return () => clearInterval(timer);
-	}, [busy]);
-
-	async function submit(event: FormEvent) {
+	function submit(event: FormEvent) {
 		event.preventDefault();
-		setBusy(true);
-		setError(null);
-		try {
+		void run("generate", async () => {
 			const result = await generateLesson({
 				month,
 				number,
@@ -37,16 +27,13 @@ export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 				brief: brief.trim() || null,
 			});
 			window.location.hash = lessonPath(result.lesson.id);
-		} catch (e) {
-			setError(message(e));
-			setBusy(false);
-		}
+		}, { leaves: true });
 	}
 
 	return (
 		<form className="sheet new-lesson" onSubmit={submit}>
 			<h2>Новый конспект</h2>
-			<fieldset disabled={busy}>
+			<fieldset disabled={busy !== null}>
 				<div className="row">
 					<label>
 						Месяц
@@ -62,7 +49,7 @@ export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 							type="number"
 							min={1}
 							value={number}
-							onChange={(e) => setNumber(Number(e.target.value))}
+							onChange={(e) => setTypedNumber(Number(e.target.value))}
 						/>
 					</label>
 				</div>
@@ -89,15 +76,10 @@ export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 				</label>
 			</fieldset>
 			{error && <p className="error-text" role="alert">{error}</p>}
-			<button className="primary" disabled={busy || !topic.trim() || number < 1}>
+			<button className="primary" disabled={busy !== null || !topic.trim() || number < 1}>
 				{busy ? "Составляем конспект…" : "Составить конспект"}
 			</button>
-			{busy && (
-				<div role="status" className="progress">
-					<div className="bar" />
-					<p className="muted">Это занимает от 30 до 90 секунд. Прошло: {seconds} с.</p>
-				</div>
-			)}
+			{busy && <Progress showElapsed />}
 		</form>
 	);
 }
