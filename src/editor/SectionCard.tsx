@@ -1,7 +1,6 @@
 import { Icon } from "../Icon";
 import type { Issue, Section, SectionKind } from "../api/types";
 import { AutoTextarea } from "./AutoTextarea";
-import { isRitual } from "./edit";
 import { IssueList } from "./IssueList";
 import { issuesAt, KIND_LABELS } from "./issues";
 
@@ -23,7 +22,6 @@ export function SectionCard({ index, total, section, issues, note, onNote, onCha
 	const path = `sections[${index}]`;
 	const own = issuesAt(issues, path);
 	const titleIssues = issuesAt(issues, `${path}.title`);
-	const fixed = isRitual(section.kind);
 	const hasError = [...own, ...titleIssues].some((i) => i.severity === "error");
 
 	return (
@@ -33,7 +31,6 @@ export function SectionCard({ index, total, section, issues, note, onNote, onCha
 				<select
 					aria-label="Вид части"
 					value={section.kind}
-					disabled={fixed}
 					onChange={(e) => onChange({ ...section, kind: e.target.value as SectionKind })}
 				>
 					{KINDS.map((kind) => (
@@ -72,15 +69,13 @@ export function SectionCard({ index, total, section, issues, note, onNote, onCha
 			<AutoTextarea
 				aria-label="Текст части"
 				rows={3}
-				readOnly={fixed}
 				placeholder="Каждый абзац — с новой строки"
 				value={section.paragraphs.join("\n")}
 				onChange={(e) => onChange({ ...section, paragraphs: e.target.value.split("\n") })}
 			/>
-			{fixed && <p className="hint">Текст ритуала фиксированный, он подставляется автоматически.</p>}
 			<IssueList issues={own} />
 
-			{!fixed && (
+			{section.kind !== "ritual" && (
 				<details className="note">
 					<summary>Что изменить в этой части{note && " ✎"}</summary>
 					<AutoTextarea

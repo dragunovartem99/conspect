@@ -11,7 +11,6 @@ const lesson: Lesson = {
 	objectives: [" one ", "two"],
 	equipment: ["a", "", "  ", "b "],
 	sections: [{ kind: "game", title: " Игра ", paragraphs: ["x", "", "  y  ", ""] }],
-	include_farewell: false,
 };
 
 describe("list helpers", () => {

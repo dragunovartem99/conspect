@@ -253,14 +253,6 @@ export function Editor({ id }: { id: string }) {
 				>
 					+ Добавить часть
 				</button>
-				<label className="check">
-					<input
-						type="checkbox"
-						checked={lesson.include_farewell}
-						onChange={(e) => edit({ ...lesson, include_farewell: e.target.checked })}
-					/>
-					Добавить прощальное стихотворение в конец занятия
-				</label>
 			</section>
 
 			<section className="sheet">

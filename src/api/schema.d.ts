@@ -175,11 +175,6 @@ export interface components {
             equipment: string[];
             /** Sections */
             sections: components["schemas"]["Section"][];
-            /**
-             * Include Farewell
-             * @default false
-             */
-            include_farewell: boolean;
         };
         /** LessonSummary */
         LessonSummary: {

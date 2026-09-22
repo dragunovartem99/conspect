@@ -1,4 +1,4 @@
-import type { Lesson, Section, SectionKind } from "../api/types";
+import type { Lesson, Section } from "../api/types";
 
 export function replaceItem<T>(list: T[], index: number, item: T): T[] {
 	return list.map((old, i) => (i === index ? item : old));
@@ -39,5 +39,3 @@ export const sectionNotes = (notes: string[]) =>
 	notes.flatMap((text, index) => (text.trim() ? [{ index, text: text.trim() }] : []));
 
 export const snapshot = (lesson: Lesson): string => JSON.stringify(cleanLesson(lesson));
-
-export const isRitual = (kind: SectionKind): boolean => kind === "ritual";
