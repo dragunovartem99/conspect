@@ -75,18 +75,16 @@ export function SectionCard({ index, total, section, issues, note, onNote, onCha
 			/>
 			<IssueList issues={own} />
 
-			{section.kind !== "ritual" && (
-				<details className="note">
-					<summary>Что изменить в этой части{note && " ✎"}</summary>
-					<AutoTextarea
-						aria-label="Замечание к части"
-						rows={2}
-						placeholder="Например: сделай загадку проще"
-						value={note}
-						onChange={(e) => onNote(e.target.value)}
-					/>
-				</details>
-			)}
+			<details className="note">
+				<summary>Что изменить в этой части{note && " ✎"}</summary>
+				<AutoTextarea
+					aria-label="Замечание к части"
+					rows={2}
+					placeholder="Например: сделай загадку проще"
+					value={note}
+					onChange={(e) => onNote(e.target.value)}
+				/>
+			</details>
 		</li>
 	);
 }
