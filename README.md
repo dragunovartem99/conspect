@@ -1,14 +1,32 @@
 # conspect
 
-The web app for [conspect-api](https://github.com/dragunovartem99/conspect-api): a lesson-plan (конспект) generator for a kindergarten teacher. Sign in with the shared password, generate a plan for a topic, edit it, download it as Word.
+The web app for a lesson-plan (конспект) generator for a kindergarten teacher. The backend is a separate, private API service that talks to Claude to write the lesson.
 
-React + Vite + TypeScript, plain `fetch`, no router, no state library, no UI kit. The interface is in Russian. Black and white on squared paper, on purpose.
+## What it does
+
+- **Sign in** with a single shared password (no accounts).
+- **Generate** a lesson plan from a month, a sequence number, a topic and, optionally, a surprise character and a technical brief.
+- **Edit** the result: objectives, equipment, and the parts of the lesson (each with a kind — ritual, game, physical minute, finger gymnastics, classwork, etc.), reordered or removed freely. Validation issues from the API (missing parts, wrong ordering, empty fields) are shown inline, next to the field they refer to.
+- **Ask the AI to revise** the plan: a note per part plus one general remark, then a rewrite that keeps everything else as written. The previous version can be restored if the rewrite is worse.
+- **Download** the finished lesson as a `.docx` file, formatted for printing.
+
+## Stack
+
+React + Vite + TypeScript, plain `fetch` (`src/api/client.ts`), a hash-based router with two screens (`src/router.ts`), no external router, no state library, no UI kit. The interface is in Russian. Black and white on squared paper, on purpose.
+
+## Project layout
+
+```
+src/api/       fetch client, auth token storage, generated API types (schema.d.ts)
+src/editor/    section cards, per-field issue list, auto-growing textarea, edit helpers
+src/screens/   Login, Lessons (list + new-lesson form), Editor
+```
 
 ## Development
 
 ```console
 $ npm ci
-$ npm run dev     # http://localhost:5173, talks to http://localhost:50002 (make run in conspect-api)
+$ npm run dev     # http://localhost:5173 — needs the API running locally on http://localhost:50002
 $ npm run check   # type-check and tests
 ```
 
@@ -16,7 +34,7 @@ $ npm run check   # type-check and tests
 
 ## API types
 
-`src/api/schema.d.ts` is generated from `conspect-api/openapi.json` (sibling checkout). Regenerate after the API changes:
+`src/api/schema.d.ts` is generated from the API's committed `openapi.json`. Regenerate after the API changes (needs a local checkout of the API repo, as a sibling directory):
 
 ```console
 $ (cd ../conspect-api && make openapi)
