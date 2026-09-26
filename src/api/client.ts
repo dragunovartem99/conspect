@@ -1,7 +1,7 @@
 import createClient from "openapi-fetch";
 
 import type { paths } from "./schema";
-import { clearToken, getToken, setToken } from "./token";
+import { clearToken, getToken, setToken } from "./token.svelte";
 import type { GenerateRequest, Lesson, ReviseRequest } from "./types";
 
 const API_URL: string =
@@ -17,7 +17,7 @@ export class ApiError extends Error {
 	}
 }
 
-/** Text to show for any error thrown by the calls below (or anything else). */
+// Text to show for any error thrown by the calls below (or anything else).
 export const message = (e: unknown): string =>
 	e instanceof Error ? e.message : "Что-то пошло не так.";
 
@@ -55,7 +55,7 @@ function detail(error: unknown, status: number): string {
 	return status === 422 ? "Проверьте введённые данные." : `Ошибка сервера (${status}).`;
 }
 
-/** The response body, or an ApiError with the server's message. */
+// The response body, or an ApiError with the server's message.
 async function unwrap<T>(
 	pending: Promise<{ data?: T; error?: unknown; response: Response }>
 ): Promise<T> {
@@ -88,7 +88,7 @@ export const getLesson = (id: string) =>
 export const updateLesson = (lesson: Lesson) =>
 	unwrap(api.PUT("/api/lessons/{lesson_id}", { ...lessonPath(lesson.id), body: lesson }));
 
-/** Returns a rewrite for review; the server saves nothing until the editor's own save. */
+// Returns a rewrite for review; the server saves nothing until the editor's own save.
 export const reviseLesson = (id: string, body: ReviseRequest) =>
 	unwrap(api.POST("/api/lessons/{lesson_id}/revise", { ...lessonPath(id), body }));
 
@@ -97,7 +97,7 @@ export async function deleteLesson(id: string): Promise<void> {
 }
 
 export function filenameFromDisposition(header: string | null): string {
-	const utf8 = header && /filename\*=UTF-8''([^;]+)/i.exec(header)?.[1];
+	const utf8 = header && /filename\*=UTF-8''([^;]+)/iu.exec(header)?.[1];
 	if (utf8) {
 		try {
 			return decodeURIComponent(utf8);
@@ -105,10 +105,10 @@ export function filenameFromDisposition(header: string | null): string {
 			// Malformed escape: use the plain filename below.
 		}
 	}
-	return (header && /filename="([^"]+)"/i.exec(header)?.[1]) || "konspekt.docx";
+	return (header && /filename="([^"]+)"/iu.exec(header)?.[1]) || "konspekt.docx";
 }
 
-/** The file needs the token, so it is fetched as a blob rather than linked to. */
+// The file needs the token, so it is fetched as a blob rather than linked to.
 export async function getDocx(id: string): Promise<{ blob: Blob; filename: string }> {
 	const pending = api.GET("/api/lessons/{lesson_id}/docx", {
 		...lessonPath(id),

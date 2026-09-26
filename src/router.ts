@@ -1,8 +1,6 @@
-import { useSyncExternalStore } from "react";
-
 export type Route = { name: "list" } | { name: "lesson"; id: string };
 
-const LESSON = /^#\/lessons\/([0-9a-f]{32})$/;
+const LESSON = /^#\/lessons\/([0-9a-f]{32})$/u;
 
 export function parseRoute(hash: string): Route {
 	const id = LESSON.exec(hash)?.[1];
@@ -11,12 +9,3 @@ export function parseRoute(hash: string): Route {
 
 export const lessonPath = (id: string) => `#/lessons/${id}`;
 export const listPath = "#/";
-
-function subscribe(onChange: () => void): () => void {
-	window.addEventListener("hashchange", onChange);
-	return () => window.removeEventListener("hashchange", onChange);
-}
-
-export function useHash(): string {
-	return useSyncExternalStore(subscribe, () => window.location.hash);
-}
