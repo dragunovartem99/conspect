@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import type { Lesson } from "../api/types";
 import { cleanLesson, moveItem, sectionNotes, removeItem, replaceItem, snapshot } from "./edit";
 

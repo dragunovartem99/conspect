@@ -1,4 +1,5 @@
 import createClient from "openapi-fetch";
+
 import type { paths } from "./schema";
 import { clearToken, getToken, setToken } from "./token";
 import type { GenerateRequest, Lesson, ReviseRequest } from "./types";
@@ -10,14 +11,15 @@ const API_URL: string =
 export class ApiError extends Error {
 	constructor(
 		readonly status: number,
-		message: string,
+		message: string
 	) {
 		super(message);
 	}
 }
 
 /** Text to show for any error thrown by the calls below (or anything else). */
-export const message = (e: unknown): string => (e instanceof Error ? e.message : "Что-то пошло не так.");
+export const message = (e: unknown): string =>
+	e instanceof Error ? e.message : "Что-то пошло не так.";
 
 const api = createClient<paths>({
 	baseUrl: API_URL,
@@ -28,7 +30,8 @@ const api = createClient<paths>({
 api.use({
 	onRequest({ request, schemaPath }) {
 		const token = getToken();
-		if (token && schemaPath !== "/api/login") request.headers.set("authorization", `Bearer ${token}`);
+		if (token && schemaPath !== "/api/login")
+			request.headers.set("authorization", `Bearer ${token}`);
 		return request;
 	},
 	onResponse({ request, response }) {
@@ -41,14 +44,21 @@ api.use({
 });
 
 function detail(error: unknown, status: number): string {
-	if (typeof error === "object" && error && "detail" in error && typeof error.detail === "string") {
+	if (
+		typeof error === "object" &&
+		error &&
+		"detail" in error &&
+		typeof error.detail === "string"
+	) {
 		return error.detail;
 	}
 	return status === 422 ? "Проверьте введённые данные." : `Ошибка сервера (${status}).`;
 }
 
 /** The response body, or an ApiError with the server's message. */
-async function unwrap<T>(pending: Promise<{ data?: T; error?: unknown; response: Response }>): Promise<T> {
+async function unwrap<T>(
+	pending: Promise<{ data?: T; error?: unknown; response: Response }>
+): Promise<T> {
 	const { data, error, response } = await pending;
 	if (!response.ok) throw new ApiError(response.status, detail(error, response.status));
 	return data as T;
@@ -69,9 +79,11 @@ export const logout = clearToken;
 
 export const listLessons = () => unwrap(api.GET("/api/lessons"));
 
-export const generateLesson = (body: GenerateRequest) => unwrap(api.POST("/api/lessons/generate", { body }));
+export const generateLesson = (body: GenerateRequest) =>
+	unwrap(api.POST("/api/lessons/generate", { body }));
 
-export const getLesson = (id: string) => unwrap(api.GET("/api/lessons/{lesson_id}", lessonPath(id)));
+export const getLesson = (id: string) =>
+	unwrap(api.GET("/api/lessons/{lesson_id}", lessonPath(id)));
 
 export const updateLesson = (lesson: Lesson) =>
 	unwrap(api.PUT("/api/lessons/{lesson_id}", { ...lessonPath(lesson.id), body: lesson }));
@@ -98,7 +110,10 @@ export function filenameFromDisposition(header: string | null): string {
 
 /** The file needs the token, so it is fetched as a blob rather than linked to. */
 export async function getDocx(id: string): Promise<{ blob: Blob; filename: string }> {
-	const pending = api.GET("/api/lessons/{lesson_id}/docx", { ...lessonPath(id), parseAs: "blob" });
+	const pending = api.GET("/api/lessons/{lesson_id}/docx", {
+		...lessonPath(id),
+		parseAs: "blob",
+	});
 	const blob = await unwrap(pending);
 	const { response } = await pending;
 	return { blob, filename: filenameFromDisposition(response.headers.get("content-disposition")) };

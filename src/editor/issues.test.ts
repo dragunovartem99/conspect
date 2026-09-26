@@ -1,4 +1,5 @@
 import { expect, it } from "vitest";
+
 import type { Issue } from "../api/types";
 import { countBySeverity, issuesAt } from "./issues";
 

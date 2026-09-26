@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+
 import { logout } from "./api/client";
 import { getToken, subscribeToken } from "./api/token";
 import { listPath, parseRoute, useHash } from "./router";
@@ -19,18 +20,26 @@ export function App() {
 					<h1>Конспект</h1>
 				</a>
 				{signedIn && (
-					<button type="button" onClick={logout}>
+					<button
+						type="button"
+						onClick={logout}
+					>
 						Выйти
 					</button>
 				)}
 			</header>
 			<main>
-				{!signedIn ? (
-					<Login />
-				) : route.name === "lesson" ? (
-					<Editor key={route.id} id={route.id} />
+				{signedIn ? (
+					route.name === "lesson" ? (
+						<Editor
+							key={route.id}
+							id={route.id}
+						/>
+					) : (
+						<Lessons />
+					)
 				) : (
-					<Lessons />
+					<Login />
 				)}
 			</main>
 		</>

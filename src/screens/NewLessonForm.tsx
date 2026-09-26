@@ -1,7 +1,11 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
+
 import { generateLesson } from "../api/client";
 import { AutoTextarea } from "../editor/AutoTextarea";
 import { MONTHS } from "../editor/labels";
+import { MonthSelect } from "../editor/MonthSelect";
+import { ErrorText } from "../ErrorText";
 import { useAction } from "../hooks";
 import { Progress } from "../Progress";
 import { lessonPath } from "../router";
@@ -18,30 +22,36 @@ export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 
 	function submit(event: FormEvent) {
 		event.preventDefault();
-		void run("generate", async () => {
-			const result = await generateLesson({
-				month,
-				number,
-				topic: topic.trim(),
-				character: character.trim() || null,
-				brief: brief.trim() || null,
-			});
-			window.location.hash = lessonPath(result.lesson.id);
-		}, { leaves: true });
+		void run(
+			"generate",
+			async () => {
+				const result = await generateLesson({
+					month,
+					number,
+					topic: topic.trim(),
+					character: character.trim() || null,
+					brief: brief.trim() || null,
+				});
+				window.location.hash = lessonPath(result.lesson.id);
+			},
+			{ leaves: true }
+		);
 	}
 
 	return (
-		<form className="sheet new-lesson" onSubmit={submit}>
+		<form
+			className="sheet new-lesson"
+			onSubmit={submit}
+		>
 			<h2>Новый конспект</h2>
 			<fieldset disabled={busy !== null}>
 				<div className="row">
 					<label>
 						Месяц
-						<select value={month} onChange={(e) => setMonth(e.target.value)}>
-							{MONTHS.map((m) => (
-								<option key={m}>{m}</option>
-							))}
-						</select>
+						<MonthSelect
+							value={month}
+							onChange={setMonth}
+						/>
 					</label>
 					<label>
 						Номер занятия
@@ -55,7 +65,11 @@ export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 				</div>
 				<label>
 					Тема
-					<input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Овощи" />
+					<input
+						value={topic}
+						onChange={(e) => setTopic(e.target.value)}
+						placeholder="Овощи"
+					/>
 				</label>
 				<label>
 					Персонаж-сюрприз <span className="muted">(необязательно)</span>
@@ -75,8 +89,11 @@ export function NewLessonForm({ nextNumber }: { nextNumber: number }) {
 					/>
 				</label>
 			</fieldset>
-			{error && <p className="error-text" role="alert">{error}</p>}
-			<button className="primary" disabled={busy !== null || !topic.trim() || number < 1}>
+			{error && <ErrorText>{error}</ErrorText>}
+			<button
+				className="primary"
+				disabled={busy !== null || !topic.trim() || number < 1}
+			>
 				{busy ? "Составляем конспект…" : "Составить конспект"}
 			</button>
 			{busy && <Progress showElapsed />}

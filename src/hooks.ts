@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import { message } from "./api/client";
 
 /**
@@ -31,7 +32,11 @@ export function useAction<Kind extends string>() {
 	 * Runs `action`, returning whether it succeeded; a failure is shown through `error`.
 	 * `leaves` is for actions that move off the screen: they stay busy until then.
 	 */
-	async function run(kind: Kind, action: () => Promise<unknown>, { leaves = false } = {}): Promise<boolean> {
+	async function run(
+		kind: Kind,
+		action: () => Promise<unknown>,
+		{ leaves = false } = {}
+	): Promise<boolean> {
 		setBusy(kind);
 		setError(null);
 		try {
@@ -46,4 +51,14 @@ export function useAction<Kind extends string>() {
 	}
 
 	return { busy, error, run };
+}
+
+/** Asks the browser to confirm leaving the page while `active`, e.g. with unsaved changes. */
+export function useLeaveWarning(active: boolean) {
+	useEffect(() => {
+		if (!active) return;
+		const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+		window.addEventListener("beforeunload", warn);
+		return () => window.removeEventListener("beforeunload", warn);
+	}, [active]);
 }
