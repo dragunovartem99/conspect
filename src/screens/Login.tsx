@@ -1,5 +1,8 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
+
 import { login } from "../api/client";
+import { ErrorText } from "../ErrorText";
 import { useAction } from "../hooks";
 
 /** Signing in stores the token, which by itself takes the app past this screen. */
@@ -13,7 +16,10 @@ export function Login() {
 	}
 
 	return (
-		<form className="login sheet" onSubmit={submit}>
+		<form
+			className="login sheet"
+			onSubmit={submit}
+		>
 			<h2>Вход</h2>
 			<label>
 				Пароль
@@ -25,8 +31,11 @@ export function Login() {
 					onChange={(e) => setPassword(e.target.value)}
 				/>
 			</label>
-			{error && <p className="error-text" role="alert">{error}</p>}
-			<button className="primary" disabled={busy !== null || !password}>
+			{error && <ErrorText>{error}</ErrorText>}
+			<button
+				className="primary"
+				disabled={busy !== null || !password}
+			>
 				{busy ? "Входим…" : "Войти"}
 			</button>
 		</form>

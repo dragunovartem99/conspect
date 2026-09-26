@@ -4,533 +4,542 @@
  */
 
 export interface paths {
-    "/api/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Login */
-        post: operations["login_api_login_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/lessons/generate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Generate Lesson */
-        post: operations["generate_lesson_api_lessons_generate_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/lessons/{lesson_id}/revise": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Revise Lesson
-         * @description Rewrite the lesson from the teacher's remarks. Nothing is saved: the editor decides.
-         */
-        post: operations["revise_lesson_api_lessons__lesson_id__revise_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/lessons": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Lessons */
-        get: operations["list_lessons_api_lessons_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/lessons/{lesson_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Lesson */
-        get: operations["get_lesson_api_lessons__lesson_id__get"];
-        /** Update Lesson */
-        put: operations["update_lesson_api_lessons__lesson_id__put"];
-        post?: never;
-        /** Delete Lesson */
-        delete: operations["delete_lesson_api_lessons__lesson_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/lessons/{lesson_id}/docx": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Download Docx */
-        get: operations["download_docx_api_lessons__lesson_id__docx_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
+	"/api/login": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Login */
+		post: operations["login_api_login_post"];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/lessons/generate": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Generate Lesson */
+		post: operations["generate_lesson_api_lessons_generate_post"];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/lessons/{lesson_id}/revise": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Revise Lesson
+		 * @description Rewrite the lesson from the teacher's remarks. Nothing is saved: the editor decides.
+		 */
+		post: operations["revise_lesson_api_lessons__lesson_id__revise_post"];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/lessons": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** List Lessons */
+		get: operations["list_lessons_api_lessons_get"];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/lessons/{lesson_id}": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Lesson */
+		get: operations["get_lesson_api_lessons__lesson_id__get"];
+		/** Update Lesson */
+		put: operations["update_lesson_api_lessons__lesson_id__put"];
+		post?: never;
+		/** Delete Lesson */
+		delete: operations["delete_lesson_api_lessons__lesson_id__delete"];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/lessons/{lesson_id}/docx": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Download Docx */
+		get: operations["download_docx_api_lessons__lesson_id__docx_get"];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        /** GenerateRequest */
-        GenerateRequest: {
-            /** Month */
-            month: string;
-            /** Number */
-            number: number;
-            /** Topic */
-            topic: string;
-            /** Character */
-            character?: string | null;
-            /** Brief */
-            brief?: string | null;
-        };
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
-        };
-        /** Issue */
-        Issue: {
-            /** Code */
-            code: string;
-            /**
-             * Severity
-             * @enum {string}
-             */
-            severity: "error" | "warning";
-            /** Message */
-            message: string;
-            /** Path */
-            path: string;
-        };
-        /** Lesson */
-        Lesson: {
-            /**
-             * Id
-             * @default
-             */
-            id: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at?: string;
-            /** Month */
-            month: string;
-            /** Number */
-            number: number;
-            /** Topic */
-            topic: string;
-            /** Character */
-            character?: string | null;
-            /** Brief */
-            brief?: string | null;
-            /** Objectives */
-            objectives: string[];
-            /** Equipment */
-            equipment: string[];
-            /** Sections */
-            sections: components["schemas"]["Section"][];
-        };
-        /** LessonSummary */
-        LessonSummary: {
-            /** Id */
-            id: string;
-            /** Topic */
-            topic: string;
-            /** Number */
-            number: number;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-        };
-        /** LessonWithIssues */
-        LessonWithIssues: {
-            lesson: components["schemas"]["Lesson"];
-            /** Issues */
-            issues: components["schemas"]["Issue"][];
-        };
-        /** LoginRequest */
-        LoginRequest: {
-            /** Password */
-            password: string;
-        };
-        /** LoginResponse */
-        LoginResponse: {
-            /** Token */
-            token: string;
-        };
-        /** ReviseRequest */
-        ReviseRequest: {
-            /** @description The lesson as it is in the editor, unsaved edits included. */
-            lesson: components["schemas"]["Lesson"];
-            /**
-             * Feedback
-             * @description A remark on the whole lesson.
-             * @default
-             */
-            feedback: string;
-            /** Sections */
-            sections?: components["schemas"]["SectionFeedback"][];
-        };
-        /** Section */
-        Section: {
-            /**
-             * Kind
-             * @enum {string}
-             */
-            kind: "ritual" | "surprise" | "game" | "physical_minute" | "finger_gymnastics" | "classwork" | "summary" | "reflection" | "other";
-            /** Title */
-            title: string;
-            /** Paragraphs */
-            paragraphs: string[];
-        };
-        /** SectionFeedback */
-        SectionFeedback: {
-            /**
-             * Index
-             * @description Part position in the lesson; the ritual is part 0.
-             */
-            index: number;
-            /** Text */
-            text: string;
-        };
-        /** ValidationError */
-        ValidationError: {
-            /** Location */
-            loc: (string | number)[];
-            /** Message */
-            msg: string;
-            /** Error Type */
-            type: string;
-            /** Input */
-            input?: unknown;
-            /** Context */
-            ctx?: Record<string, never>;
-        };
-    };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+	schemas: {
+		/** GenerateRequest */
+		GenerateRequest: {
+			/** Month */
+			month: string;
+			/** Number */
+			number: number;
+			/** Topic */
+			topic: string;
+			/** Character */
+			character?: string | null;
+			/** Brief */
+			brief?: string | null;
+		};
+		/** HTTPValidationError */
+		HTTPValidationError: {
+			/** Detail */
+			detail?: components["schemas"]["ValidationError"][];
+		};
+		/** Issue */
+		Issue: {
+			/** Code */
+			code: string;
+			/**
+			 * Severity
+			 * @enum {string}
+			 */
+			severity: "error" | "warning";
+			/** Message */
+			message: string;
+			/** Path */
+			path: string;
+		};
+		/** Lesson */
+		Lesson: {
+			/**
+			 * Id
+			 * @default
+			 */
+			id: string;
+			/**
+			 * Created At
+			 * Format: date-time
+			 */
+			created_at?: string;
+			/** Month */
+			month: string;
+			/** Number */
+			number: number;
+			/** Topic */
+			topic: string;
+			/** Character */
+			character?: string | null;
+			/** Brief */
+			brief?: string | null;
+			/** Objectives */
+			objectives: string[];
+			/** Equipment */
+			equipment: string[];
+			/** Sections */
+			sections: components["schemas"]["Section"][];
+		};
+		/** LessonSummary */
+		LessonSummary: {
+			/** Id */
+			id: string;
+			/** Topic */
+			topic: string;
+			/** Number */
+			number: number;
+			/**
+			 * Created At
+			 * Format: date-time
+			 */
+			created_at: string;
+		};
+		/** LessonWithIssues */
+		LessonWithIssues: {
+			lesson: components["schemas"]["Lesson"];
+			/** Issues */
+			issues: components["schemas"]["Issue"][];
+		};
+		/** LoginRequest */
+		LoginRequest: {
+			/** Password */
+			password: string;
+		};
+		/** LoginResponse */
+		LoginResponse: {
+			/** Token */
+			token: string;
+		};
+		/** ReviseRequest */
+		ReviseRequest: {
+			/** @description The lesson as it is in the editor, unsaved edits included. */
+			lesson: components["schemas"]["Lesson"];
+			/**
+			 * Feedback
+			 * @description A remark on the whole lesson.
+			 * @default
+			 */
+			feedback: string;
+			/** Sections */
+			sections?: components["schemas"]["SectionFeedback"][];
+		};
+		/** Section */
+		Section: {
+			/**
+			 * Kind
+			 * @enum {string}
+			 */
+			kind:
+				| "ritual"
+				| "surprise"
+				| "game"
+				| "physical_minute"
+				| "finger_gymnastics"
+				| "classwork"
+				| "summary"
+				| "reflection"
+				| "other";
+			/** Title */
+			title: string;
+			/** Paragraphs */
+			paragraphs: string[];
+		};
+		/** SectionFeedback */
+		SectionFeedback: {
+			/**
+			 * Index
+			 * @description Part position in the lesson; the ritual is part 0.
+			 */
+			index: number;
+			/** Text */
+			text: string;
+		};
+		/** ValidationError */
+		ValidationError: {
+			/** Location */
+			loc: (string | number)[];
+			/** Message */
+			msg: string;
+			/** Error Type */
+			type: string;
+			/** Input */
+			input?: unknown;
+			/** Context */
+			ctx?: Record<string, never>;
+		};
+	};
+	responses: never;
+	parameters: never;
+	requestBodies: never;
+	headers: never;
+	pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    login_api_login_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LoginResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    generate_lesson_api_lessons_generate_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["GenerateRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LessonWithIssues"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    revise_lesson_api_lessons__lesson_id__revise_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                lesson_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReviseRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LessonWithIssues"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_lessons_api_lessons_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LessonSummary"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_lesson_api_lessons__lesson_id__get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                lesson_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LessonWithIssues"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_lesson_api_lessons__lesson_id__put: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                lesson_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Lesson"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LessonWithIssues"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_lesson_api_lessons__lesson_id__delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                lesson_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    download_docx_api_lessons__lesson_id__docx_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                lesson_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
+	login_api_login_post: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				"application/json": components["schemas"]["LoginRequest"];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["LoginResponse"];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HTTPValidationError"];
+				};
+			};
+		};
+	};
+	generate_lesson_api_lessons_generate_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				authorization?: string | null;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				"application/json": components["schemas"]["GenerateRequest"];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["LessonWithIssues"];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HTTPValidationError"];
+				};
+			};
+		};
+	};
+	revise_lesson_api_lessons__lesson_id__revise_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				authorization?: string | null;
+			};
+			path: {
+				lesson_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				"application/json": components["schemas"]["ReviseRequest"];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["LessonWithIssues"];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HTTPValidationError"];
+				};
+			};
+		};
+	};
+	list_lessons_api_lessons_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				authorization?: string | null;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["LessonSummary"][];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HTTPValidationError"];
+				};
+			};
+		};
+	};
+	get_lesson_api_lessons__lesson_id__get: {
+		parameters: {
+			query?: never;
+			header?: {
+				authorization?: string | null;
+			};
+			path: {
+				lesson_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["LessonWithIssues"];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HTTPValidationError"];
+				};
+			};
+		};
+	};
+	update_lesson_api_lessons__lesson_id__put: {
+		parameters: {
+			query?: never;
+			header?: {
+				authorization?: string | null;
+			};
+			path: {
+				lesson_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				"application/json": components["schemas"]["Lesson"];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["LessonWithIssues"];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HTTPValidationError"];
+				};
+			};
+		};
+	};
+	delete_lesson_api_lessons__lesson_id__delete: {
+		parameters: {
+			query?: never;
+			header?: {
+				authorization?: string | null;
+			};
+			path: {
+				lesson_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HTTPValidationError"];
+				};
+			};
+		};
+	};
+	download_docx_api_lessons__lesson_id__docx_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				authorization?: string | null;
+			};
+			path: {
+				lesson_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HTTPValidationError"];
+				};
+			};
+		};
+	};
 }

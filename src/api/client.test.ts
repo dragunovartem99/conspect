@@ -1,9 +1,12 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 import { ApiError, filenameFromDisposition, getLesson, login } from "./client";
 import { clearToken, getToken, subscribeToken } from "./token";
 
 function stubFetch(status: number, body: unknown) {
-	const fetchMock = vi.fn(async () => new Response(JSON.stringify(body), { status }));
+	const fetchMock = vi.fn<() => Promise<Response>>(
+		async () => new Response(JSON.stringify(body), { status })
+	);
 	vi.stubGlobal("fetch", fetchMock);
 	return fetchMock;
 }
@@ -35,7 +38,7 @@ it("does not send a token to the login route", async () => {
 it("signs out when the server rejects the token", async () => {
 	stubFetch(200, { token: "t0k" });
 	await login("secret");
-	const signedOut = vi.fn();
+	const signedOut = vi.fn<() => void>();
 	const stop = subscribeToken(signedOut);
 
 	stubFetch(401, { detail: "Sign in required." });
@@ -55,13 +58,18 @@ it("shows the server's message, and a Russian one when the server is unreachable
 	await expect(getLesson("abc")).rejects.toThrow("Claude API rate limit reached.");
 
 	vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("network")));
-	await expect(getLesson("abc")).rejects.toMatchObject({ status: 0, message: expect.stringContaining("Нет связи") });
+	await expect(getLesson("abc")).rejects.toMatchObject({
+		status: 0,
+		message: expect.stringContaining("Нет связи"),
+	});
 });
 
 it("reads the download name from Content-Disposition", () => {
 	const header = `attachment; filename="konspekt_5.docx"; filename*=UTF-8''konspekt_5_%D0%9E%D0%B2%D0%BE%D1%89%D0%B8.docx`;
 	expect(filenameFromDisposition(header)).toBe("konspekt_5_Овощи.docx");
-	expect(filenameFromDisposition('attachment; filename="konspekt_5.docx"')).toBe("konspekt_5.docx");
+	expect(filenameFromDisposition('attachment; filename="konspekt_5.docx"')).toBe(
+		"konspekt_5.docx"
+	);
 	expect(filenameFromDisposition(null)).toBe("konspekt.docx");
 	expect(filenameFromDisposition("attachment; filename*=UTF-8''%E0%A4%A")).toBe("konspekt.docx");
 });

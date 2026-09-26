@@ -28,7 +28,7 @@ src/screens/   Login, Lessons (list + new-lesson form), Editor
 ```console
 $ npm ci
 $ npm run dev     # http://localhost:5173 — needs the API running locally on http://localhost:50002
-$ npm run check   # type-check and tests
+$ npm run test
 ```
 
 `VITE_API_URL` overrides the API address; production builds default to `https://api.conspect.su`. The API only accepts requests from the origin in its `ALLOWED_ORIGIN` (localhost:5173 by default).
@@ -39,11 +39,11 @@ $ npm run check   # type-check and tests
 
 ```console
 $ (cd ../conspect-api && make openapi)
-$ npm run types
+$ npm run types:generate
 ```
 
-## Deploying
+## Deployment
 
-Pushing to `main` builds the site and copies it to the VPS: `$VPS_PROJECT_PATH-releases/<commit>/`, with `$VPS_PROJECT_PATH` (`/www/conspect`) a symlink to the newest release. The last three releases are kept. The same run installs the `Caddyfile` and reloads Caddy.
+Pull requests run `format:check`, `types:check`, `lint:check` and `test`, and so does the pre-commit hook. Merging to `main` runs the same checks, then builds the site and deploys it through [pipes](https://github.com/dragunovartem99/pipes) `deploy-vps` (release strategy): `$VPS_PROJECT_PATH-releases/<commit>/`, with `$VPS_PROJECT_PATH` (`/www/conspect`) a symlink to it; older releases are removed. `deploy.sh` then installs the `Caddyfile` and reloads Caddy.
 
 Repository secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_PROJECT_PATH`.

@@ -3,12 +3,17 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
 		"build": "tsc -b && vite build",
+		"dev": "vite",
+		"format": "oxfmt --write",
+		"format:check": "oxfmt --check",
+		"lint": "oxlint --fix",
+		"lint:check": "oxlint",
+		"prepare": "husky",
 		"preview": "vite preview",
 		"test": "vitest run",
-		"types": "openapi-typescript ../conspect-api/openapi.json -o src/api/schema.d.ts",
-		"check": "tsc -b && vitest run"
+		"types:check": "tsc -b",
+		"types:generate": "openapi-typescript ../conspect-api/openapi.json -o src/api/schema.d.ts"
 	},
 	"dependencies": {
 		"@fontsource-variable/literata": "^5.3.0",
@@ -17,11 +22,16 @@
 		"react-dom": "^19.3.0"
 	},
 	"devDependencies": {
+		"@dragunovartem99/oxfmt-config": "^2.1.0",
+		"@dragunovartem99/oxlint-config": "^3.0.1",
 		"@types/node": "^26.6.2",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"@vitejs/plugin-react": "^6.1.1",
+		"husky": "^9.1.7",
 		"openapi-typescript": "^7.13.0",
+		"oxfmt": "^0.70.0",
+		"oxlint": "^1.85.0",
 		"typescript": "^5.9.3",
 		"vite": "^8.3.0",
 		"vitest": "^5.0.1"

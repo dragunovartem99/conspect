@@ -2,53 +2,20 @@ name: Deploy
 
 on:
     push:
-        branches: [main]
-    # Lets a deploy be started by hand from the Actions tab.
+        branches: ["main"]
     workflow_dispatch:
 
 jobs:
-    deploy:
-        # One deploy at a time: they share a directory.
-        concurrency:
-            group: deploy-production
-            cancel-in-progress: false
-        runs-on: ubuntu-latest
-        env:
-            SSH_TARGET: ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}
-            PROJECT_PATH: ${{ secrets.VPS_PROJECT_PATH }}
-        steps:
-            - uses: actions/checkout@v4
+    ci:
+        uses: ./.github/workflows/ci.yaml
 
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: 24
-                  cache: npm
-
-            - run: npm ci
-            - run: npm run check
-            - run: npm run build
-
-            - uses: webfactory/ssh-agent@v0.10.0
-              with:
-                  ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
-
-            # Each deploy goes to its own directory and the live path is a symlink to it,
-            # swapped in one step, so visitors never see a half-copied site. The last few
-            # releases stay, for a quick rollback.
-            - name: Deploy
-              run: |
-                  set -eu
-                  RELEASE="$PROJECT_PATH-releases/$GITHUB_SHA"
-                  SSH="ssh -o StrictHostKeyChecking=accept-new"
-                  $SSH "$SSH_TARGET" "mkdir -p '$RELEASE'"
-                  rsync -rlt --delete --chmod=D755,F644 -e "$SSH" dist/ "$SSH_TARGET:$RELEASE/"
-                  rsync -t -e "$SSH" Caddyfile "$SSH_TARGET:$PROJECT_PATH-releases/Caddyfile"
-                  $SSH "$SSH_TARGET" "PROJECT_PATH='$PROJECT_PATH' RELEASE='$RELEASE' sh -s" <<'SCRIPT'
-                  set -eu
-                  ln -sfn "$RELEASE" "$PROJECT_PATH.new"
-                  mv -T "$PROJECT_PATH.new" "$PROJECT_PATH"
-                  sudo cp "$PROJECT_PATH-releases/Caddyfile" /etc/caddy/sites/conspect.caddy
-                  sudo systemctl reload caddy
-                  cd "$PROJECT_PATH-releases"
-                  ls -dt */ | tail -n +4 | xargs -r rm -rf
-                  SCRIPT
+    pipes:
+        needs: ci
+        uses: dragunovartem99/pipes/.github/workflows/deploy-vps.yaml@v1.0.1
+        with:
+            strategy: release
+            setup: node
+            build: npm run build
+            upload: dist/ Caddyfile deploy.sh
+            url: https://conspect.su
+        secrets: inherit

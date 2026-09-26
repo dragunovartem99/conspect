@@ -1,6 +1,8 @@
 import { useState } from "react";
+
 import { deleteLesson, listLessons, message } from "../api/client";
 import type { LessonSummary } from "../api/types";
+import { ErrorText } from "../ErrorText";
 import { useLoad } from "../hooks";
 import { lessonPath } from "../router";
 import { NewLessonForm } from "./NewLessonForm";
@@ -27,19 +29,24 @@ export function Lessons() {
 			<NewLessonForm nextNumber={nextNumber} />
 			<section className="sheet">
 				<h2>Мои конспекты</h2>
-				{error && <p className="error-text" role="alert">{error}</p>}
+				{error && <ErrorText>{error}</ErrorText>}
 				{lessons === null && !error && <p className="muted">Загрузка…</p>}
 				{lessons?.length === 0 && <p className="muted">Пока нет ни одного конспекта.</p>}
 				<ul className="lessons">
 					{lessons?.map((lesson) => (
 						<li key={lesson.id}>
 							<a href={lessonPath(lesson.id)}>
-								<span className="lesson-number">№{lesson.number}</span> {lesson.topic}
+								<span className="lesson-number">№{lesson.number}</span>{" "}
+								{lesson.topic}
 							</a>
 							<span className="muted">
-								{lesson.created_at && new Date(lesson.created_at).toLocaleDateString("ru-RU")}
+								{lesson.created_at &&
+									new Date(lesson.created_at).toLocaleDateString("ru-RU")}
 							</span>
-							<button type="button" onClick={() => remove(lesson)}>
+							<button
+								type="button"
+								onClick={() => remove(lesson)}
+							>
 								Удалить
 							</button>
 						</li>

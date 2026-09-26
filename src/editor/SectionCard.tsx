@@ -1,10 +1,9 @@
-import { Icon } from "../Icon";
-import type { Issue, Section, SectionKind } from "../api/types";
+import type { Issue, Section } from "../api/types";
 import { AutoTextarea } from "./AutoTextarea";
 import { IssueList } from "./IssueList";
 import { issuesAt } from "./issues";
-import { KIND_LABELS } from "./labels";
 import { LinesTextarea } from "./LinesTextarea";
+import { SectionCardHead } from "./SectionCardHead";
 
 interface Props {
 	index: number;
@@ -18,9 +17,17 @@ interface Props {
 	onRemove: () => void;
 }
 
-const KINDS = Object.keys(KIND_LABELS) as SectionKind[];
-
-export function SectionCard({ index, total, section, issues, note, onNote, onChange, onMove, onRemove }: Props) {
+export function SectionCard({
+	index,
+	total,
+	section,
+	issues,
+	note,
+	onNote,
+	onChange,
+	onMove,
+	onRemove,
+}: Props) {
 	const path = `sections[${index}]`;
 	const own = issuesAt(issues, path);
 	const titleIssues = issuesAt(issues, `${path}.title`);
@@ -28,40 +35,18 @@ export function SectionCard({ index, total, section, issues, note, onNote, onCha
 
 	return (
 		<li className={`card${hasError ? " has-error" : ""}`}>
-			<div className="card-head">
-				<span className="number">{index + 1}</span>
-				<select
-					aria-label="Вид части"
-					value={section.kind}
-					onChange={(e) => onChange({ ...section, kind: e.target.value as SectionKind })}
-				>
-					{KINDS.map((kind) => (
-						<option key={kind} value={kind}>
-							{KIND_LABELS[kind]}
-						</option>
-					))}
-				</select>
-				<span className="spacer" />
-				<button type="button" className="square" aria-label="Выше" disabled={index === 0} onClick={() => onMove(-1)}>
-					<Icon name="up" />
-				</button>
-				<button
-					type="button"
-					className="square"
-					aria-label="Ниже"
-					disabled={index === total - 1}
-					onClick={() => onMove(1)}
-				>
-					<Icon name="down" />
-				</button>
-				<button type="button" onClick={onRemove}>
-					Удалить
-				</button>
-			</div>
+			<SectionCardHead
+				index={index}
+				total={total}
+				kind={section.kind}
+				onKind={(kind) => onChange({ ...section, kind })}
+				onMove={onMove}
+				onRemove={onRemove}
+			/>
 
 			<input
 				aria-label="Заголовок части"
-				className={titleIssues.length ? "invalid" : ""}
+				className={titleIssues.length > 0 ? "invalid" : ""}
 				placeholder="Заголовок"
 				value={section.title}
 				onChange={(e) => onChange({ ...section, title: e.target.value })}

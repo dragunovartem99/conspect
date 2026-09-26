@@ -11,7 +11,10 @@ export function Progress({ showElapsed = false }: { showElapsed?: boolean }) {
 	}, [showElapsed]);
 
 	return (
-		<div role="status" className="progress">
+		<div
+			role="status"
+			className="progress"
+		>
 			<div className="bar" />
 			<p className="muted">
 				Это занимает от 30 до 90 секунд.{showElapsed && ` Прошло: ${seconds} с.`}

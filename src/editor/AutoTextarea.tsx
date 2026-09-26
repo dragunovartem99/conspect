@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef, type ComponentProps } from "react";
+import { useLayoutEffect, useRef } from "react";
+import type { ComponentProps } from "react";
 
 /** A textarea that is always as tall as its text, so nothing needs scrolling to read. */
 export function AutoTextarea(props: ComponentProps<"textarea">) {
@@ -16,5 +17,10 @@ export function AutoTextarea(props: ComponentProps<"textarea">) {
 		return () => window.removeEventListener("resize", fit);
 	}, [props.value]);
 
-	return <textarea ref={ref} {...props} />;
+	return (
+		<textarea
+			ref={ref}
+			{...props}
+		/>
+	);
 }
