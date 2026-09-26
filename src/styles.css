@@ -29,7 +29,7 @@ body {
 	background-size: 24px 24px;
 }
 
-#root {
+#app {
 	max-width: 46rem;
 	margin: 0 auto;
 	padding: 0 16px 4rem;
