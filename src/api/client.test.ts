@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 import { ApiError, filenameFromDisposition, getLesson, login } from "./client";
-import { clearToken, getToken, subscribeToken } from "./token";
+import { clearToken, getToken } from "./token.svelte";
 
 function stubFetch(status: number, body: unknown) {
 	const fetchMock = vi.fn<() => Promise<Response>>(
@@ -38,14 +38,10 @@ it("does not send a token to the login route", async () => {
 it("signs out when the server rejects the token", async () => {
 	stubFetch(200, { token: "t0k" });
 	await login("secret");
-	const signedOut = vi.fn<() => void>();
-	const stop = subscribeToken(signedOut);
 
 	stubFetch(401, { detail: "Sign in required." });
 	await expect(getLesson("abc")).rejects.toBeInstanceOf(ApiError);
-	expect(signedOut).toHaveBeenCalledOnce();
 	expect(getToken()).toBeNull();
-	stop();
 });
 
 it("says so when the password is wrong", async () => {

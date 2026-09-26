@@ -1,7 +1,7 @@
 import createClient from "openapi-fetch";
 
 import type { paths } from "./schema";
-import { clearToken, getToken, setToken } from "./token";
+import { clearToken, getToken, setToken } from "./token.svelte";
 import type { GenerateRequest, Lesson, ReviseRequest } from "./types";
 
 const API_URL: string =

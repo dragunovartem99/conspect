@@ -12,15 +12,15 @@ The web app for a lesson-plan (конспект) generator for a kindergarten te
 
 ## Stack
 
-React + Vite + TypeScript, `openapi-fetch` typed from the generated schema (`src/api/client.ts`), a hash-based router with two screens (`src/router.ts`), no external router, no state library, no UI kit. The interface is in Russian. Black and white on squared paper, on purpose.
+Svelte 5 (runes) + Vite + TypeScript, `openapi-fetch` typed from the generated schema (`src/api/client.ts`), a hash-based router with two screens (`src/router.ts`), no SvelteKit, no external router, no UI kit. The interface is in Russian. Black and white on squared paper, on purpose.
 
 ## Project layout
 
 ```
-src/api/       typed API client, auth token store, generated API types (schema.d.ts)
-src/editor/    editor state (reducer), section cards, per-field issue list, textareas, labels, edit helpers
-src/hooks.ts   useLoad (fetch on mount) and useAction (busy + error for a button)
-src/screens/   Login, Lessons (list + new-lesson form), Editor
+src/api/              typed API client, reactive auth token, generated API types (schema.d.ts)
+src/editor/           the lesson draft (a runes class), section cards, per-field issue list, labels, edit helpers
+src/action.svelte.ts  Action: busy + error for a button
+src/screens/          Login, Lessons (list + new-lesson form), Editor
 ```
 
 ## Development
