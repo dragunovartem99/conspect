@@ -19,7 +19,7 @@ export function moveItem<T>(list: T[], index: number, delta: -1 | 1): T[] {
 
 export const emptySection = (): Section => ({ kind: "other", title: "", paragraphs: [""] });
 
-/** What is sent to the server: stray blank lines and spaces from the textareas removed. */
+// What is sent to the server: stray blank lines and spaces from the textareas removed.
 export function cleanLesson(lesson: Lesson): Lesson {
 	return {
 		...lesson,
@@ -34,7 +34,7 @@ export function cleanLesson(lesson: Lesson): Lesson {
 	};
 }
 
-/** The non-blank per-part remarks in the shape the API takes. */
+// The non-blank per-part remarks in the shape the API takes.
 export const sectionNotes = (notes: string[]) =>
 	notes.flatMap((text, index) => (text.trim() ? [{ index, text: text.trim() }] : []));
 

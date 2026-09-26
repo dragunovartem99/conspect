@@ -49,7 +49,7 @@ export class Draft implements Text {
 		this.#saved = snapshot(result.lesson);
 	}
 
-	/** Not saved: it shows as an unsaved change until the teacher accepts it. */
+	// Not saved: it shows as an unsaved change until the teacher accepts it.
 	revised(result: LessonWithIssues): void {
 		this.before = $state.snapshot({
 			fields: this.fields,
@@ -93,7 +93,7 @@ export class Draft implements Text {
 		this.#restructure(() => (this.parts = removeItem(this.parts, index)));
 	}
 
-	/** Takes in a lesson from the server. Parts keep their keys and, if asked, remarks by position. */
+	// Takes in a lesson from the server. Parts keep their keys and, if asked, remarks by position.
 	#receive({ lesson, issues }: LessonWithIssues, keepNotes: boolean): void {
 		const { sections, ...fields } = lesson;
 		this.parts = sections.map((section, i) => {
@@ -108,7 +108,7 @@ export class Draft implements Text {
 		this.issues = issues;
 	}
 
-	/** Issue paths are positions, so adding, removing or moving things makes them stale. */
+	// Issue paths are positions, so adding, removing or moving things makes them stale.
 	#restructure(change: () => void): void {
 		change();
 		this.issues = [];

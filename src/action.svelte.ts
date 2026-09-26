@@ -5,10 +5,8 @@ export class Action<Kind extends string> {
 	busy: Kind | null = $state(null);
 	error: string | null = $state(null);
 
-	/**
-	 * Runs `action`, returning whether it succeeded; a failure is shown through `error`.
-	 * `leaves` is for actions that move off the screen: they stay busy until then.
-	 */
+	// Runs `action`, returning whether it succeeded; a failure is shown through `error`.
+	// `leaves` is for actions that move off the screen: they stay busy until then.
 	async run(
 		kind: Kind,
 		action: () => Promise<unknown>,

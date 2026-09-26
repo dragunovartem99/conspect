@@ -41,7 +41,7 @@
 		});
 	}
 
-	/** Asks the browser to confirm leaving the page with unsaved changes. */
+	// Asks the browser to confirm leaving the page with unsaved changes.
 	function warnOnLeave(event: BeforeUnloadEvent) {
 		if (draft.dirty) event.preventDefault();
 	}

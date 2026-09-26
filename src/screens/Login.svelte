@@ -6,7 +6,7 @@
 	let password = $state("");
 	const action = new Action<"login">();
 
-	/** Signing in stores the token, which by itself takes the app past this screen. */
+	// Signing in stores the token, which by itself takes the app past this screen.
 	function submit(event: SubmitEvent) {
 		event.preventDefault();
 		void action.run("login", () => login(password), { leaves: true });

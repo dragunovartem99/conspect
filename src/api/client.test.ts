@@ -4,8 +4,8 @@ import { ApiError, filenameFromDisposition, getLesson, login } from "./client";
 import { clearToken, getToken } from "./token.svelte";
 
 function stubFetch(status: number, body: unknown) {
-	const fetchMock = vi.fn<() => Promise<Response>>(
-		async () => new Response(JSON.stringify(body), { status })
+	const fetchMock = vi.fn<() => Promise<Response>>(() =>
+		Promise.resolve(new Response(JSON.stringify(body), { status }))
 	);
 	vi.stubGlobal("fetch", fetchMock);
 	return fetchMock;

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { onMount } from "svelte";
+
 	import { deleteLesson, listLessons, message } from "../api/client";
 	import type { LessonSummary } from "../api/types";
 	import ErrorText from "../ErrorText.svelte";
@@ -8,10 +10,13 @@
 	let lessons = $state<LessonSummary[] | null>(null);
 	let error = $state<string | null>(null);
 
-	listLessons().then(
-		(list) => (lessons = list),
-		(e) => (error = message(e))
-	);
+	onMount(async () => {
+		try {
+			lessons = await listLessons();
+		} catch (e) {
+			error = message(e);
+		}
+	});
 
 	async function remove(lesson: LessonSummary) {
 		if (!confirm(`Удалить конспект №${lesson.number} «${lesson.topic}»?`)) return;
