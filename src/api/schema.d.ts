@@ -21,6 +21,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	"/api/profiles": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** List Profiles */
+		get: operations["list_profiles_api_profiles_get"];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	"/api/lessons/generate": {
 		parameters: {
 			query?: never;
@@ -115,8 +132,25 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
 	schemas: {
+		/** BlockLabel */
+		BlockLabel: {
+			/** Block */
+			block: string;
+			/** Label */
+			label: string;
+		};
 		/** GenerateRequest */
 		GenerateRequest: {
+			/**
+			 * Age
+			 * @description Children's age in years.
+			 */
+			age: number;
+			/**
+			 * Kind
+			 * @description A kind of lesson from /api/profiles.
+			 */
+			kind: string;
 			/** Month */
 			month: string;
 			/** Number */
@@ -150,15 +184,15 @@ export interface components {
 		/** Lesson */
 		Lesson: {
 			/**
-			 * Id
-			 * @default
+			 * Age
+			 * @description Children's age in years.
 			 */
-			id: string;
+			age: number;
 			/**
-			 * Created At
-			 * Format: date-time
+			 * Kind
+			 * @description A kind of lesson from /api/profiles.
 			 */
-			created_at?: string;
+			kind: string;
 			/** Month */
 			month: string;
 			/** Number */
@@ -169,6 +203,16 @@ export interface components {
 			character?: string | null;
 			/** Brief */
 			brief?: string | null;
+			/**
+			 * Id
+			 * @default
+			 */
+			id: string;
+			/**
+			 * Created At
+			 * Format: date-time
+			 */
+			created_at?: string;
 			/** Objectives */
 			objectives: string[];
 			/** Equipment */
@@ -180,6 +224,10 @@ export interface components {
 		LessonSummary: {
 			/** Id */
 			id: string;
+			/** Age */
+			age: number;
+			/** Kind */
+			kind: string;
 			/** Topic */
 			topic: string;
 			/** Number */
@@ -206,6 +254,22 @@ export interface components {
 			/** Token */
 			token: string;
 		};
+		/** ProfileSummary */
+		ProfileSummary: {
+			/** Id */
+			id: string;
+			/** Age */
+			age: number;
+			/** Kind */
+			kind: string;
+			/** Name */
+			name: string;
+			/**
+			 * Blocks
+			 * @description The blocks a lesson may use, in lesson order.
+			 */
+			blocks: components["schemas"]["BlockLabel"][];
+		};
 		/** ReviseRequest */
 		ReviseRequest: {
 			/** @description The lesson as it is in the editor, unsaved edits included. */
@@ -221,20 +285,8 @@ export interface components {
 		};
 		/** Section */
 		Section: {
-			/**
-			 * Kind
-			 * @enum {string}
-			 */
-			kind:
-				| "ritual"
-				| "surprise"
-				| "game"
-				| "physical_minute"
-				| "finger_gymnastics"
-				| "classwork"
-				| "summary"
-				| "reflection"
-				| "other";
+			/** Block */
+			block: string;
 			/** Title */
 			title: string;
 			/** Paragraphs */
@@ -292,6 +344,37 @@ export interface operations {
 				};
 				content: {
 					"application/json": components["schemas"]["LoginResponse"];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["HTTPValidationError"];
+				};
+			};
+		};
+	};
+	list_profiles_api_profiles_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				authorization?: string | null;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					"application/json": components["schemas"]["ProfileSummary"][];
 				};
 			};
 			/** @description Validation Error */

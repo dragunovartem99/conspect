@@ -18,7 +18,8 @@
 	<SectionCardHead
 		{index}
 		total={draft.parts.length}
-		bind:kind={part.section.kind}
+		blocks={draft.blocks}
+		bind:block={part.section.block}
 		onMove={(delta) => draft.moveSection(index, delta)}
 		onRemove={() => draft.removeSection(index)}
 	/>

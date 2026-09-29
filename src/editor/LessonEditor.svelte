@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Action } from "../action.svelte";
 	import { getDocx, reviseLesson, updateLesson } from "../api/client";
-	import type { LessonWithIssues } from "../api/types";
+	import type { BlockLabel, LessonWithIssues } from "../api/types";
 	import Icon from "../Icon.svelte";
 	import { listPath } from "../router";
 	import { saveFile } from "../saveFile";
@@ -14,10 +14,10 @@
 	import ReviseSheet from "./ReviseSheet.svelte";
 	import SaveBar from "./SaveBar.svelte";
 
-	let { initial }: { initial: LessonWithIssues } = $props();
+	let { initial, blocks }: { initial: LessonWithIssues; blocks: BlockLabel[] } = $props();
 
 	// svelte-ignore state_referenced_locally
-	const draft = new Draft(initial);
+	const draft = new Draft(initial, blocks);
 	const action = new Action<"save" | "docx" | "revise">();
 
 	const save = () =>

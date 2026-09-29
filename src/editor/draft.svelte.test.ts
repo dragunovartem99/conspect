@@ -3,10 +3,12 @@ import { describe, expect, it } from "vitest";
 import type { Issue, Lesson, Section } from "../api/types";
 import { Draft } from "./draft.svelte";
 
-const section = (title: string): Section => ({ kind: "game", title, paragraphs: ["x"] });
+const section = (title: string): Section => ({ block: "game", title, paragraphs: ["x"] });
 
 const lesson: Lesson = {
 	id: "a".repeat(32),
+	age: 5,
+	kind: "complex",
 	month: "Сентябрь",
 	number: 5,
 	topic: "Овощи",
@@ -18,7 +20,13 @@ const lesson: Lesson = {
 
 const issue: Issue = { code: "x", severity: "error", message: "m", path: "sections[1].title" };
 
-const start = () => new Draft({ lesson, issues: [issue] });
+const BLOCKS = [
+	{ block: "game", label: "Игра" },
+	{ block: "other", label: "Другое" },
+	{ block: "reflection", label: "Рефлексия" },
+];
+
+const start = () => new Draft({ lesson, issues: [issue] }, BLOCKS);
 const titles = (draft: Draft) => draft.parts.map((p) => p.section.title);
 const keys = (draft: Draft) => draft.parts.map((p) => p.key);
 
@@ -37,6 +45,16 @@ describe("parts", () => {
 		draft.removeSection(2);
 		draft.addSection();
 		expect(keys(draft)).toEqual([0, 1, 3]);
+	});
+
+	it("start as the lesson's catch-all block when added", () => {
+		const draft = start();
+		draft.addSection();
+		expect(draft.parts.at(-1)?.section.block).toBe("other");
+
+		const withoutOther = new Draft({ lesson, issues: [] }, BLOCKS.slice(0, 1));
+		withoutOther.addSection();
+		expect(withoutOther.parts.at(-1)?.section.block).toBe("game");
 	});
 });
 

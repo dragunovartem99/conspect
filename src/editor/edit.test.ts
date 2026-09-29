@@ -5,13 +5,15 @@ import { cleanLesson, moveItem, sectionNotes, removeItem, replaceItem, snapshot 
 
 const lesson: Lesson = {
 	id: "a".repeat(32),
+	age: 5,
+	kind: "complex",
 	month: "Сентябрь",
 	number: 5,
 	topic: "Овощи",
 	character: "  ",
 	objectives: [" one ", "two"],
 	equipment: ["a", "", "  ", "b "],
-	sections: [{ kind: "game", title: " Игра ", paragraphs: ["x", "", "  y  ", ""] }],
+	sections: [{ block: "game", title: " Игра ", paragraphs: ["x", "", "  y  ", ""] }],
 };
 
 describe("list helpers", () => {
@@ -39,7 +41,7 @@ describe("cleanLesson", () => {
 
 	it("drops blank lines and trims text", () => {
 		expect(clean.equipment).toEqual(["a", "b"]);
-		expect(clean.sections[0]).toEqual({ kind: "game", title: "Игра", paragraphs: ["x", "y"] });
+		expect(clean.sections[0]).toEqual({ block: "game", title: "Игра", paragraphs: ["x", "y"] });
 		expect(clean.objectives).toEqual(["one", "two"]);
 	});
 
