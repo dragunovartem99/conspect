@@ -79,6 +79,9 @@ export const logout = clearToken;
 
 export const listLessons = () => unwrap(api.GET("/api/lessons"));
 
+// The kinds of lesson for every age, with the blocks each may use.
+export const listProfiles = () => unwrap(api.GET("/api/profiles"));
+
 export const generateLesson = (body: GenerateRequest) =>
 	unwrap(api.POST("/api/lessons/generate", { body }));
 

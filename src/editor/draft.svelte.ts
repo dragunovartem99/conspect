@@ -1,4 +1,4 @@
-import type { Issue, Lesson, LessonWithIssues, Section } from "../api/types";
+import type { BlockLabel, Issue, Lesson, LessonWithIssues, Section } from "../api/types";
 import { emptySection, moveItem, removeItem, sectionNotes, snapshot } from "./edit";
 
 type Fields = Omit<Lesson, "sections">;
@@ -38,7 +38,13 @@ export class Draft implements Text {
 		return { ...this.fields, sections: this.parts.map((part) => part.section) };
 	}
 
-	constructor(result: LessonWithIssues) {
+	/**
+	 * `blocks`: the blocks this kind of lesson may use, in lesson order, for the part pickers.
+	 */
+	constructor(
+		result: LessonWithIssues,
+		readonly blocks: BlockLabel[]
+	) {
 		const { sections: _, ...fields } = result.lesson;
 		this.fields = $state(fields);
 		this.saved(result);
@@ -79,9 +85,12 @@ export class Draft implements Text {
 		);
 	}
 
+	// A new part starts as "other" if the lesson has it, else as the last block.
 	addSection(): void {
+		const block =
+			this.blocks.find((b) => b.block === "other")?.block ?? this.blocks.at(-1)?.block ?? "";
 		this.#restructure(() =>
-			this.parts.push({ key: this.#nextKey++, section: emptySection(), note: "" })
+			this.parts.push({ key: this.#nextKey++, section: emptySection(block), note: "" })
 		);
 	}
 

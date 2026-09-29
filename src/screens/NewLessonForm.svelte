@@ -10,6 +10,9 @@
 
 	let { nextNumber }: { nextNumber: number } = $props();
 
+	// The only kind of lesson so far; a picker comes with the second one (see /api/profiles).
+	const PROFILE = { age: 5, kind: "complex" };
+
 	let month = $state(MONTHS[new Date().getMonth()] ?? "");
 	/** Undefined until the teacher types a number: until then it follows the suggested one. */
 	let typedNumber: number | null | undefined = $state();
@@ -26,6 +29,7 @@
 			"generate",
 			async () => {
 				const result = await generateLesson({
+					...PROFILE,
 					month,
 					number,
 					topic: topic.trim(),

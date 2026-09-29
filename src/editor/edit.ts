@@ -17,7 +17,7 @@ export function moveItem<T>(list: T[], index: number, delta: -1 | 1): T[] {
 	return moved;
 }
 
-export const emptySection = (): Section => ({ kind: "other", title: "", paragraphs: [""] });
+export const emptySection = (block: string): Section => ({ block, title: "", paragraphs: [""] });
 
 // What is sent to the server: stray blank lines and spaces from the textareas removed.
 export function cleanLesson(lesson: Lesson): Lesson {
