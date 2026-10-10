@@ -31,7 +31,7 @@ $ npm run dev     # http://localhost:5173 — needs the API running locally on h
 $ npm run test
 ```
 
-`VITE_API_URL` overrides the API address; production builds default to `https://api.conspect.su`. The API only accepts requests from the origin in its `ALLOWED_ORIGIN` (localhost:5173 by default).
+`VITE_API_URL` is the API address: `.env.development` for `npm run dev`, `.env.production` for builds. The API only accepts requests from the origin in its `ALLOWED_ORIGIN` (localhost:5173 by default).
 
 ## API types
 
