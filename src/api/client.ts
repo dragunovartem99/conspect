@@ -4,9 +4,7 @@ import type { paths } from "./schema";
 import { clearToken, getToken, setToken } from "./token.svelte";
 import type { GenerateRequest, Lesson, ReviseRequest } from "./types";
 
-const API_URL: string =
-	import.meta.env.VITE_API_URL ??
-	(import.meta.env.PROD ? "https://api.conspect.su" : "http://localhost:50002");
+const API_URL: string = import.meta.env.VITE_API_URL;
 
 export class ApiError extends Error {
 	constructor(
