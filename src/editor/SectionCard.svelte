@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { untrack } from "svelte";
+
 	import AutoTextarea from "./AutoTextarea.svelte";
 	import type { Draft } from "./draft.svelte";
 	import IssueList from "./IssueList.svelte";
@@ -12,6 +14,13 @@
 	const own = $derived(issuesAt(draft.issues, path));
 	const titleIssues = $derived(issuesAt(draft.issues, `${path}.title`));
 	const hasError = $derived([...own, ...titleIssues].some((i) => i.severity === "error"));
+
+	let open = $state(false);
+	// On a rewrite and on its undo (`before` changes on both), only the parts with a remark stay open.
+	$effect(() => {
+		void draft.before;
+		open = untrack(() => part.note !== "");
+	});
 </script>
 
 <li class={["card", { "has-error": hasError }]}>
@@ -43,7 +52,10 @@
 	/>
 	<IssueList issues={own} />
 
-	<details class="note">
+	<details
+		class="note"
+		bind:open
+	>
 		<summary>Что изменить в этой части{part.note ? " ✎" : ""}</summary>
 		<AutoTextarea
 			aria-label="Замечание к части"

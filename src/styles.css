@@ -145,6 +145,7 @@ button.square {
 
 .back {
 	display: inline-flex;
+	margin-top: 12px;
 	gap: 6px;
 	align-items: center;
 }
@@ -209,10 +210,6 @@ fieldset:disabled {
 .summary {
 	margin: 8px 0 0;
 	font-weight: 700;
-}
-
-.back {
-	margin-top: 12px;
 }
 
 /* Validation: errors are white on black, warnings outlined, so neither needs colour. */
@@ -359,20 +356,52 @@ fieldset:disabled {
 	accent-color: var(--ink);
 }
 
-.actions {
+/* Nothing moves: the labels never change, the state is told in the status, the undo row grows the bar upwards. */
+.toolbar {
 	position: sticky;
 	bottom: 0;
-	display: flex;
+	z-index: 1;
+	display: grid;
 	gap: 10px;
-	align-items: center;
-	margin: 0 -16px;
-	padding: 12px 16px;
+	padding: 10px 24px;
 	background: var(--paper);
-	border-top: 1px solid var(--ink);
+	border: 1px solid var(--ink);
+	border-bottom: 0;
+	border-radius: 3px 3px 0 0;
+	box-shadow: 0 -6px 16px -8px rgb(27 36 64 / 0.3);
+}
+
+.toolbar-row {
+	display: flex;
+	gap: 10px 16px;
+	align-items: center;
 }
 
 .status {
 	flex: 1;
+	white-space: nowrap;
+}
+
+.unsaved {
+	color: var(--margin);
+	font-weight: 600;
+}
+
+.toolbar .buttons {
+	display: flex;
+	flex-shrink: 0;
+	gap: 10px;
+}
+
+.rewritten {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 16px;
+	align-items: center;
+	justify-content: space-between;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--rule);
+	font-weight: 600;
 }
 
 .status .error-text {
@@ -410,6 +439,28 @@ fieldset:disabled {
 	margin: 3rem auto;
 }
 
+/* Too narrow for the status and three buttons in one row. */
+@media (max-width: 44rem) {
+	.toolbar {
+		padding-inline: 16px;
+	}
+
+	.toolbar-row {
+		flex-wrap: wrap;
+	}
+
+	/* Two buttons in a row, the download under them at full width: the labels never squeeze. */
+	.toolbar .buttons {
+		display: grid;
+		flex: 1 0 100%;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.toolbar .buttons .primary {
+		grid-column: 1 / -1;
+	}
+}
+
 @media (max-width: 34rem) {
 	.row {
 		grid-template-columns: 1fr;
@@ -423,10 +474,6 @@ fieldset:disabled {
 	.objective button {
 		grid-column: 2;
 		justify-self: start;
-	}
-
-	.actions {
-		flex-wrap: wrap;
 	}
 }
 
