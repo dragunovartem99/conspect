@@ -69,6 +69,10 @@
 	error={action.error}
 	dirty={draft.dirty}
 	busy={action.busy}
+	remarks={draft.remarks}
+	canUndo={draft.before !== null}
 	onSave={save}
 	onDownload={download}
+	onRevise={revise}
+	onUndo={() => draft.undo()}
 />

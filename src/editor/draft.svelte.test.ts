@@ -97,6 +97,7 @@ it("clears remarks on a rewrite, which can be undone", () => {
 	draft.feedback = "проще";
 	const noted = $state.snapshot(draft.parts);
 	expect(draft.notes).toEqual([{ index: 1, text: "короче" }]);
+	expect(draft.remarks).toBe(2);
 
 	const rewritten = { ...lesson, sections: [section("D"), section("E")] };
 	draft.revised({ lesson: rewritten, issues: [issue] });

@@ -32,7 +32,8 @@ export class Draft implements Text {
 
 	dirty = $derived(snapshot(this.lesson) !== this.#saved);
 	notes = $derived(sectionNotes(this.parts.map((part) => part.note)));
-	hasRemarks = $derived(this.feedback.trim() !== "" || this.notes.length > 0);
+	remarks = $derived(this.notes.length + (this.feedback.trim() === "" ? 0 : 1));
+	hasRemarks = $derived(this.remarks > 0);
 
 	get lesson(): Lesson {
 		return { ...this.fields, sections: this.parts.map((part) => part.section) };

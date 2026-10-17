@@ -253,16 +253,29 @@ fieldset:disabled {
 	list-style: none;
 }
 
+/* A long topic wraps; the program and date go under it, the delete button stays on the right. */
 .lessons li {
-	display: flex;
-	gap: 12px;
-	align-items: baseline;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 2px 12px;
+	align-items: center;
 	padding: 10px 0;
 	border-bottom: 1px solid var(--rule);
 }
 
 .lessons a {
-	flex: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.lessons li .muted {
+	grid-row: 2;
+	font-size: 0.85rem;
+}
+
+.lessons li button {
+	grid-column: 2;
+	grid-row: 1 / span 2;
 }
 
 .lesson-number {
