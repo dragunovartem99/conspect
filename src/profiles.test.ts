@@ -1,40 +1,35 @@
 import { expect, it } from "vitest";
 
 import type { Profile } from "./api/types";
-import { ageLabel, ages, kindsOf, profileLabel } from "./profiles";
+import { kindsOf, profileLabel, programs } from "./profiles";
 
-const profile = (age: number, kind: string, name: string): Profile => ({
-	id: `${kind}-${age}`,
-	age,
+const profile = (program: string, programName: string, kind: string, name: string): Profile => ({
+	id: `${kind}-${program}`,
+	program,
+	program_name: programName,
 	kind,
 	name,
 	blocks: [],
 });
 
 const PROFILES = [
-	profile(3, "complex", "Комплексное занятие"),
-	profile(5, "literacy", "Грамота"),
-	profile(5, "math", "Математика"),
+	profile("3", "3 года", "complex", "Комплексное занятие"),
+	profile("5-prep", "5 лет — промежуточная программа", "literacy", "Грамота и чтение"),
+	profile("5-prep", "5 лет — промежуточная программа", "math", "Математика"),
 ];
 
-it("names ages in Russian", () => {
-	expect([1, 3, 4, 5, 11, 21, 22].map((age) => ageLabel(age))).toEqual([
-		"1 год",
-		"3 года",
-		"4 года",
-		"5 лет",
-		"11 лет",
-		"21 год",
-		"22 года",
+it("lists each program once and the kinds of a program", () => {
+	expect(programs(PROFILES)).toEqual([
+		{ key: "3", name: "3 года" },
+		{ key: "5-prep", name: "5 лет — промежуточная программа" },
 	]);
+	expect(kindsOf(PROFILES, "5-prep").map((p) => p.kind)).toEqual(["literacy", "math"]);
 });
 
-it("lists each age once and the kinds of an age", () => {
-	expect(ages(PROFILES)).toEqual([3, 5]);
-	expect(kindsOf(PROFILES, 5).map((p) => p.kind)).toEqual(["literacy", "math"]);
-});
-
-it("names the kind only where the age has several", () => {
-	expect(profileLabel(PROFILES, 3, "complex")).toBe("3 года");
-	expect(profileLabel(PROFILES, 5, "math")).toBe("5 лет, Математика");
+it("names the kind only where the program has several", () => {
+	expect(profileLabel(PROFILES, "3", "complex")).toBe("3 года");
+	expect(profileLabel(PROFILES, "5-prep", "math")).toBe(
+		"5 лет — промежуточная программа, Математика"
+	);
+	expect(profileLabel(PROFILES, "gone", "complex")).toBe("gone");
 });

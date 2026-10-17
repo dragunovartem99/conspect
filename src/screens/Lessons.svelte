@@ -47,11 +47,11 @@
 		{#each lessons ?? [] as lesson (lesson.id)}
 			<li>
 				<a href={lessonPath(lesson.id)}>
-					<span class="lesson-number">№{lesson.number}</span>
-					· {lesson.month} · {lesson.topic}
+					<span class="lesson-number">{lesson.month}, №{lesson.number}</span>
+					· {lesson.topic}
 				</a>
 				<span class="muted">
-					{profileLabel(profiles, lesson.age, lesson.kind)},
+					{profileLabel(profiles, lesson.program, lesson.kind)},
 					{lesson.created_at
 						? new Date(lesson.created_at).toLocaleDateString("ru-RU")
 						: ""}

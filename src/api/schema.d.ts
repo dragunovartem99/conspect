@@ -142,10 +142,10 @@ export interface components {
 		/** GenerateRequest */
 		GenerateRequest: {
 			/**
-			 * Age
-			 * @description Children's age in years.
+			 * Program
+			 * @description A program from /api/profiles, e.g. `4` or `5-prep`.
 			 */
-			age: number;
+			program: string;
 			/**
 			 * Kind
 			 * @description A kind of lesson from /api/profiles.
@@ -184,10 +184,10 @@ export interface components {
 		/** Lesson */
 		Lesson: {
 			/**
-			 * Age
-			 * @description Children's age in years.
+			 * Program
+			 * @description A program from /api/profiles, e.g. `4` or `5-prep`.
 			 */
-			age: number;
+			program: string;
 			/**
 			 * Kind
 			 * @description A kind of lesson from /api/profiles.
@@ -224,8 +224,8 @@ export interface components {
 		LessonSummary: {
 			/** Id */
 			id: string;
-			/** Age */
-			age: number;
+			/** Program */
+			program: string;
 			/** Kind */
 			kind: string;
 			/** Month */
@@ -260,8 +260,10 @@ export interface components {
 		ProfileSummary: {
 			/** Id */
 			id: string;
-			/** Age */
-			age: number;
+			/** Program */
+			program: string;
+			/** Program Name */
+			program_name: string;
 			/** Kind */
 			kind: string;
 			/** Name */

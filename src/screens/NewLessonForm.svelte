@@ -6,13 +6,13 @@
 	import { MONTHS } from "../editor/labels";
 	import MonthSelect from "../editor/MonthSelect.svelte";
 	import ErrorText from "../ErrorText.svelte";
-	import { ageLabel, ages, kindsOf } from "../profiles";
+	import { kindsOf, programs } from "../profiles";
 	import Progress from "../Progress.svelte";
 	import { lessonPath } from "../router";
 
 	let { profiles }: { profiles: Profile[] } = $props();
 
-	let pickedAge: number | null = $state(null);
+	let pickedProgram: string | null = $state(null);
 	let kind = $state("");
 	let month = $state(MONTHS[new Date().getMonth()] ?? "");
 	let number: number | null = $state(1);
@@ -20,8 +20,8 @@
 	let character = $state("");
 	let brief = $state("");
 	const action = new Action<"generate">();
-	const age = $derived(pickedAge ?? ages(profiles)[0] ?? 0);
-	const kinds = $derived(kindsOf(profiles, age));
+	const program = $derived(pickedProgram ?? programs(profiles)[0]?.key ?? "");
+	const kinds = $derived(kindsOf(profiles, program));
 	const profile = $derived(kinds.find((p) => p.kind === kind) ?? kinds[0]);
 	const hasSurprise = $derived(profile?.blocks.some((b) => b.block === "surprise") ?? false);
 
@@ -29,7 +29,7 @@
 		event.preventDefault();
 		if (number === null || !profile) return;
 		const request = {
-			age: profile.age,
+			program: profile.program,
 			kind: profile.kind,
 			month,
 			number,
@@ -56,10 +56,10 @@
 	<fieldset disabled={action.busy !== null}>
 		<div class="row">
 			<label>
-				Возраст
-				<select bind:value={() => age, (value) => (pickedAge = value)}>
-					{#each ages(profiles) as value (value)}
-						<option {value}>{ageLabel(value)}</option>
+				Программа
+				<select bind:value={() => program, (value) => (pickedProgram = value)}>
+					{#each programs(profiles) as p (p.key)}
+						<option value={p.key}>{p.name}</option>
 					{/each}
 				</select>
 			</label>

@@ -8,7 +8,7 @@
 	let { id }: { id: string } = $props();
 	// The blocks the lesson's kind may use, for the part pickers.
 	const blocksOf = (lesson: Lesson, profiles: Profile[]) =>
-		profiles.find((p) => p.age === lesson.age && p.kind === lesson.kind)?.blocks ?? [];
+		profiles.find((p) => p.program === lesson.program && p.kind === lesson.kind)?.blocks ?? [];
 
 	// svelte-ignore state_referenced_locally
 	const loading = Promise.all([getLesson(id), listProfiles()]);
