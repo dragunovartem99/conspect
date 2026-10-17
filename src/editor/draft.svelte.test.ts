@@ -7,7 +7,7 @@ const section = (title: string): Section => ({ block: "game", title, paragraphs:
 
 const lesson: Lesson = {
 	id: "a".repeat(32),
-	age: 5,
+	program: "4",
 	kind: "complex",
 	month: "Сентябрь",
 	number: 5,
