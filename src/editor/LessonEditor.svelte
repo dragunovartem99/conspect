@@ -12,7 +12,7 @@
 	import ObjectivesSheet from "./ObjectivesSheet.svelte";
 	import PartsSheet from "./PartsSheet.svelte";
 	import ReviseSheet from "./ReviseSheet.svelte";
-	import SaveBar from "./SaveBar.svelte";
+	import Toolbar from "./Toolbar.svelte";
 
 	let { initial, blocks }: { initial: LessonWithIssues; blocks: BlockLabel[] } = $props();
 
@@ -65,7 +65,7 @@
 	revising={action.busy === "revise"}
 	onRevise={revise}
 />
-<SaveBar
+<Toolbar
 	error={action.error}
 	dirty={draft.dirty}
 	busy={action.busy}

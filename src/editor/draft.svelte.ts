@@ -51,7 +51,9 @@ export class Draft implements Text {
 		this.saved(result);
 	}
 
+	// Saving accepts the rewrite: there is nothing to undo any more.
 	saved(result: LessonWithIssues): void {
+		this.before = null;
 		this.#receive(result, true);
 		this.#saved = snapshot(result.lesson);
 	}

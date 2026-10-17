@@ -74,13 +74,14 @@ describe("issues", () => {
 	});
 });
 
-it("tracks unsaved changes against the last save", () => {
+it("tracks unsaved changes against the last save, which ends the undo of a rewrite", () => {
 	const draft = start();
 	expect(draft.dirty).toBe(false);
-	draft.fields.topic = "Фрукты";
+	draft.revised({ lesson: { ...lesson, topic: "Фрукты" }, issues: [] });
 	expect(draft.dirty).toBe(true);
 	draft.saved({ lesson: draft.lesson, issues: [] });
 	expect(draft.dirty).toBe(false);
+	expect(draft.before).toBeNull();
 });
 
 it("keeps keys and remarks through a save", () => {
