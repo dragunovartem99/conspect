@@ -1,18 +1,20 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 
-	import { deleteLesson, listLessons, message } from "../api/client";
-	import type { LessonSummary } from "../api/types";
+	import { deleteLesson, listLessons, listProfiles, message } from "../api/client";
+	import type { LessonSummary, Profile } from "../api/types";
 	import ErrorText from "../ErrorText.svelte";
+	import { profileLabel } from "../profiles";
 	import { lessonPath } from "../router";
 	import NewLessonForm from "./NewLessonForm.svelte";
 
 	let lessons = $state<LessonSummary[] | null>(null);
+	let profiles = $state<Profile[]>([]);
 	let error = $state<string | null>(null);
 
 	onMount(async () => {
 		try {
-			lessons = await listLessons();
+			[lessons, profiles] = await Promise.all([listLessons(), listProfiles()]);
 		} catch (e) {
 			error = message(e);
 		}
@@ -27,11 +29,11 @@
 			error = message(e);
 		}
 	}
-
-	const nextNumber = $derived(Math.max(0, ...(lessons ?? []).map((l) => l.number)) + 1);
 </script>
 
-<NewLessonForm {nextNumber} />
+{#if profiles.length > 0}
+	<NewLessonForm {profiles} />
+{/if}
 <section class="sheet">
 	<h2>Мои конспекты</h2>
 	{#if error}
@@ -46,9 +48,10 @@
 			<li>
 				<a href={lessonPath(lesson.id)}>
 					<span class="lesson-number">№{lesson.number}</span>
-					{lesson.topic}
+					· {lesson.month} · {lesson.topic}
 				</a>
 				<span class="muted">
+					{profileLabel(profiles, lesson.age, lesson.kind)},
 					{lesson.created_at
 						? new Date(lesson.created_at).toLocaleDateString("ru-RU")
 						: ""}
