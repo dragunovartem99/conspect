@@ -228,6 +228,8 @@ export interface components {
 			age: number;
 			/** Kind */
 			kind: string;
+			/** Month */
+			month: string;
 			/** Topic */
 			topic: string;
 			/** Number */
